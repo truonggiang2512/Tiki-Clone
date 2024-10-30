@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "author": "Ha Nguyen Truong Giang",
-  "description": "Docute",
+  "description": "Docute de thwn",
   "engines": {
     "node": ">=18.x"
   },
