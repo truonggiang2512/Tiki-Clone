@@ -1,11 +1,12 @@
 import express from 'express'
 import { mapOrder } from '~/utils/sorts.js'
-
+import corsConfig from './config/cors'
+import cors from 'cors'
 const app = express()
 
 const hostname = 'localhost'
 const port = 8017
-
+app.use(cors(corsConfig))
 app.get('/', (req, res) => {
   // Test Absolute import mapOrder
   console.log(mapOrder(
