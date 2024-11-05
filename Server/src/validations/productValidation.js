@@ -1,15 +1,16 @@
 import Joi, { string } from "joi";
 import { StatusCodes } from 'http-status-codes'
+import ApiError from "~/utils/ApiError";
 
-const createNew = async (req, res) => {
+const createNew = async (req, res, next) => {
   const correctCondition = Joi.object({
     name: Joi.string().required().min(3).max(50).trim().strict(),
     desc: Joi.string().required().min(3).max(120).trim().strict(),
-    price: Joi.number().required(),
-    discount: Joi.number(),
-    finalPrice: Joi.number(),
-    stock: Joi.number().required(),
-    createdAt: Joi.date().required()
+    // price: Joi.number().required(),
+    // discount: Joi.number(),
+    // finalPrice: Joi.number(),
+    // stock: Joi.number().required(),
+    // createdAt: Joi.date().required()
   })
   try {
     await correctCondition.validateAsync(req.body, { abortEarly: false })
@@ -17,11 +18,9 @@ const createNew = async (req, res) => {
     next();
   }
   catch (error) {
-    res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
-      errors: new Error(error).message
-    })
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
   }
-  res.status(StatusCodes.CREATED).json({ message: 'create API product ' })
+
 }
 export const boardValidation = {
   createNew

@@ -1,5 +1,7 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
+import ApiError from "~/utils/ApiError";
 import { env } from "./environment";
+import { StatusCodes } from 'http-status-codes'
 
 // Định nghĩa tikiDatabaseInstance với giá trị ban đầu là null
 let tikiDatabaseInstance = null;
@@ -21,7 +23,8 @@ const CONNECT_DB = async () => {
     // Lưu trữ đối tượng database vào tikiDatabaseInstance
     tikiDatabaseInstance = client.db(env.DATABASE_NAME); // Thay "admin" bằng tên database của bạn, nếu khác
   } catch (error) {
-    throw new Error(`Failed to connect to MongoDB: ${error.message}`);
+    throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, `Failed to connect to MongoDB: ${error.message}`);
+    next()
   }
 };
 
