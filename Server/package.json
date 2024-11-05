@@ -17,7 +17,11 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.26.0",
-    "express": "^4.21.1"
+    "async-exit-hook": "^2.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "mongodb": "^6.10.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.25.9",
