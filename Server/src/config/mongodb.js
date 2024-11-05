@@ -14,7 +14,7 @@ const client = new MongoClient(uri, {
   }
 });
 
-export const CONNECT_DB = async () => {
+const CONNECT_DB = async () => {
   try {
     // Kết nối client tới server
     await client.connect();
@@ -25,7 +25,17 @@ export const CONNECT_DB = async () => {
   }
 };
 
-export const GET_DB = () => {
+const GET_DB = () => {
   if (!tikiDatabaseInstance) throw new Error('Must connect to database first!');
   return tikiDatabaseInstance;
 };
+
+const CLOSE_DB = async () => {
+  await tikiDatabaseInstance.close()
+}
+
+export {
+  CONNECT_DB,
+  GET_DB,
+  CLOSE_DB
+}

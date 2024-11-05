@@ -2,8 +2,8 @@ import express from 'express'
 import { mapOrder } from '~/utils/sorts.js'
 import corsConfig from '~/config/cors'
 import cors from 'cors'
-import { CONNECT_DB, GET_DB } from '~/config/mongodb'
-
+import { CONNECT_DB, GET_DB, CLOSE_DB } from '~/config/mongodb'
+import exitHook from "async-exit-hook"
 const START_SERVER = () => {
   const app = express()
   const hostname = 'localhost'
@@ -18,6 +18,9 @@ const START_SERVER = () => {
 
     // eslint-disable-next-line no-console
     console.log(`Hello Docute, I am running at ${hostname}:${port}/`)
+  })
+  exitHook(() => {
+    CLOSE_DB()
   })
 }
 (async () => {
