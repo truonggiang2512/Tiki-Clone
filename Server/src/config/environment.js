@@ -1,7 +1,8 @@
 import 'dotenv/config'
-const MONGODB_URI = `mongodb+srv://${process.env.USERNAME}:${process.env.PASSWORD}@tiki-clone.j9i82.mongodb.net/`
-const DATABASE_NAME = 'Tiki-Clone'
-export {
-  MONGODB_URI,
-  DATABASE_NAME
+export const env = {
+  MONGODB_URI: process.env.MONGODB_URI,
+  DATABASE_NAME: process.env.DATABASE_NAME,
+  APP_PORT: process.env.APP_PORT,
+  APP_HOST: process.env.APP_HOST,
+  AUTHOR: process.env.AUTHOR
 }
