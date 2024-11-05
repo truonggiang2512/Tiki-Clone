@@ -12,9 +12,9 @@ const createNew = async (req, res) => {
     createdAt: Joi.date().required()
   })
   try {
-    console.log(req.body)
     await correctCondition.validateAsync(req.body, { abortEarly: false })
-    res.status(StatusCodes.CREATED).json({ message: 'POST from Validation: API create new board' })
+    // validate du lieu thanh cong -> controller dieu huong 
+    next();
   }
   catch (error) {
     res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
