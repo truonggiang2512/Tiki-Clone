@@ -13,7 +13,7 @@ export const errorHandlingMiddleware = (err, req, res, next) => {
   }
 
   // chi khi moi truong la dev thi moi tra ve stack trace de debug de dang hon con khong thi xoa di 
-  // if (env.BUILD_MODE !== 'dev') delete responseError.stack
+  if (env.BUILD_MODE !== 'dev') delete responseError.stack
 
   //tra ve responeError // cho FE
   res.status(responseError.statusCode).json(responseError)
