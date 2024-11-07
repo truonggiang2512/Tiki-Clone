@@ -12,7 +12,7 @@ const createNew = async (reqBody) => {
       slug: slugify(reqBody.name),
       _destroy: false
     }
-
+    await productModel.PRODUCT_COLLECTION_SCHEMA.validateAsync(newProduct, { abortEarly: false })
     // Goi toi tang model de xu ly luu ban ghi newProduct vao trong database
     const createdProduct = await productModel.createNew(newProduct)
 
@@ -36,8 +36,7 @@ const editOneById = async (reqBody, productId) => {
     updatedAt: new Date().getTime(),
   }
   await productModel.editOneById(newProduct, productId)
-  return await productModel.findOneById(ObjectId.createFromHexString(productId))
-    ;
+  return await productModel.findOneById(ObjectId.createFromHexString(productId));
 }
 const deleteOne = async (productId) => {
   const getProductById = await productModel.findOneById(ObjectId.createFromHexString(productId))
