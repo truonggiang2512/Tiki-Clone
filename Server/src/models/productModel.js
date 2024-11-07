@@ -1,7 +1,7 @@
 import Joi from "joi";
 import { GET_DB } from "~/config/mongodb";
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from "./validator";
-
+import { ObjectId } from 'mongodb';
 const PRODUCT_COLLECTION_NAME = 'products'
 const PRODUCT_COLLECTION_SCHEMA = Joi.object({
   sellerId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
@@ -40,7 +40,15 @@ const findOneById = async (id) => {
 const getAllProduct = async () => {
   try {
     const result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).find().toArray()
-    return result
+    return result;
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+const editOneById = async (data, productId) => {
+  try {
+    const result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).updateOne({ _id: ObjectId.createFromHexString(productId) }, { $set: data })
+    return result;
   } catch (error) {
     throw new Error(error)
   }
@@ -50,5 +58,6 @@ export const productModel = {
   PRODUCT_COLLECTION_SCHEMA,
   createNew,
   findOneById,
-  getAllProduct
+  getAllProduct,
+  editOneById
 }

@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb"
 import { productModel } from "~/models/productModel"
 import { slugify } from "~/utils/formatter"
 
@@ -23,7 +24,19 @@ const createNew = async (reqBody) => {
     throw error
   }
 }
+const editOneById = async (reqBody, productId) => {
+  const newProduct = {
+    ...reqBody,
+    finalPrice: reqBody.discount ? reqBody.price - (reqBody.price * (reqBody.discount / 100)) : reqBody.price,
+    updatedAt: new Date().getTime(),
+  }
+  await productModel.editOneById(newProduct, productId)
+  const getProductUpdated = await productModel.findOneById(ObjectId.createFromHexString(productId))
+  return getProductUpdated;
+
+}
 export const productService = {
-  createNew
+  createNew,
+  editOneById
 }
 

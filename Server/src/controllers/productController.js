@@ -23,7 +23,17 @@ const getAll = async (req, res, next) => {
     next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.message))
   }
 }
+const editOneById = async (req, res, next) => {
+  try {
+    const result = await productService.editOneById(req.body, req.params.id);
+    res.status(StatusCodes.OK).json(result)
+  } catch (error) {
+    console.log(error)
+    next(new ApiError(StatusCodes.NO_CONTENT, error.message))
+  }
+}
 export const productController = {
   createNew,
-  getAll
+  getAll,
+  editOneById
 }
