@@ -14,7 +14,17 @@ const createNew = async (req, res, next) => {
     next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.message))
   }
 }
+const signIn = async (req, res, next) => {
+  try {
+    //dieu huong toi tang service
+    const token = await userService.signIn(req.body)
+    res.status(StatusCodes.OK).json({ token })
+  } catch (error) {
+    next(new ApiError(StatusCodes.BAD_REQUEST, error.message))
+  }
+}
 
 export const userController = {
-  createNew
+  createNew,
+  signIn
 }

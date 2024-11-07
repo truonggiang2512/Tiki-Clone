@@ -26,25 +26,40 @@ const createNew = async (reqBody) => {
   }
 }
 const getAll = async () => {
-  const getAllProduct = await productModel.getAllProduct();
-  return getAllProduct.filter((item) => item._destroy == false)
+  try {
+    const getAllProduct = await productModel.getAllProduct();
+    return getAllProduct.filter((item) => item._destroy == false)
+  } catch (error) {
+    throw error
+  }
+
 }
 const editOneById = async (reqBody, productId) => {
-  const newProduct = {
-    ...reqBody,
-    finalPrice: reqBody.discount ? reqBody.price - (reqBody.price * (reqBody.discount / 100)) : reqBody.price,
-    updatedAt: new Date().getTime(),
+  try {
+    const newProduct = {
+      ...reqBody,
+      finalPrice: reqBody.discount ? reqBody.price - (reqBody.price * (reqBody.discount / 100)) : reqBody.price,
+      updatedAt: new Date().getTime(),
+    }
+    await productModel.editOneById(newProduct, productId)
+    return await productModel.findOneById(ObjectId.createFromHexString(productId));
+  } catch (error) {
+    throw error
   }
-  await productModel.editOneById(newProduct, productId)
-  return await productModel.findOneById(ObjectId.createFromHexString(productId));
+
 }
 const deleteOne = async (productId) => {
-  const getProductById = await productModel.findOneById(ObjectId.createFromHexString(productId))
-  const newProduct = {
-    ...getProductById,
-    _destroy: true,
+  try {
+    const getProductById = await productModel.findOneById(ObjectId.createFromHexString(productId))
+    const newProduct = {
+      ...getProductById,
+      _destroy: true,
+    }
+    return await productModel.editOneById(newProduct, productId)
+  } catch (error) {
+    throw error
   }
-  return await productModel.editOneById(newProduct, productId)
+
 }
 export const productService = {
   getAll,

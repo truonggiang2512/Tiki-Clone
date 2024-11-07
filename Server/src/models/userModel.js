@@ -44,8 +44,17 @@ const createNew = async (data) => {
   }
 }
 
+const getUserByEmail = async (email) => {
+  try {
+    return GET_DB().collection(USER_COLLECTION_NAME).findOne({ email })
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
-  createNew
+  createNew,
+  getUserByEmail
 }

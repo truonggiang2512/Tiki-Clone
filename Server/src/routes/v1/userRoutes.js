@@ -12,8 +12,6 @@ Router.route('/signup')
     .get((req, res) => {
       res.status(StatusCodes.OK).json({ message: ' get API user ' })
     })
-    .post((req, res) => {
-      res.status(StatusCodes.CREATED).json({ message: 'create API user ' })
-    })
+    .post(userValidation.signIn, userController.signIn)
 
 export const userRoutes = Router
