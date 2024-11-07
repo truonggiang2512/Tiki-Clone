@@ -9,7 +9,8 @@ const createNew = async (reqBody) => {
       ...reqBody,
       finalPrice: reqBody.discount ? reqBody.price - (reqBody.price * (reqBody.discount / 100)) : reqBody.price,
       updatedAt: null,
-      slug: slugify(reqBody.name)
+      slug: slugify(reqBody.name),
+      _destroy: false
     }
 
     // Goi toi tang model de xu ly luu ban ghi newProduct vao trong database
@@ -24,6 +25,10 @@ const createNew = async (reqBody) => {
     throw error
   }
 }
+const getAll = async () => {
+  const getAllProduct = await productModel.getAllProduct();
+  return getAllProduct.filter((item) => item._destroy == false)
+}
 const editOneById = async (reqBody, productId) => {
   const newProduct = {
     ...reqBody,
@@ -31,12 +36,21 @@ const editOneById = async (reqBody, productId) => {
     updatedAt: new Date().getTime(),
   }
   await productModel.editOneById(newProduct, productId)
-  const getProductUpdated = await productModel.findOneById(ObjectId.createFromHexString(productId))
-  return getProductUpdated;
-
+  return await productModel.findOneById(ObjectId.createFromHexString(productId))
+    ;
+}
+const deleteOne = async (productId) => {
+  const getProductById = await productModel.findOneById(ObjectId.createFromHexString(productId))
+  const newProduct = {
+    ...getProductById,
+    _destroy: true,
+  }
+  return await productModel.editOneById(newProduct, productId)
 }
 export const productService = {
+  getAll,
   createNew,
-  editOneById
+  editOneById,
+  deleteOne,
 }
 
