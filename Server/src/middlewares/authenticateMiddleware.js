@@ -20,3 +20,10 @@ export const authenticateJWT = (req, res, next) => {
     next();
   });
 }
+// Middleware to authorize only admins
+export const authorizeAdmin = (req, res, next) => {
+  if (req.user.role !== 'admin') {
+    return res.status(StatusCodes.FORBIDDEN).json({ message: 'Admin access required' });
+  }
+  next();
+};

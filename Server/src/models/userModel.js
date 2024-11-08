@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb"
+
 const Joi = require("joi")
 const { GET_DB } = require("~/config/mongodb")
 
@@ -51,10 +53,43 @@ const getUserByEmail = async (email) => {
     throw new Error(error)
   }
 }
+const updateUserById = async (data, userId) => {
+  try {
+    return await GET_DB().collection(USER_COLLECTION_NAME).updateOne({ _id: ObjectId.createFromHexString(userId) }, { $set: data })
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 
+const getUserById = async (userId) => {
+  try {
+    return await GET_DB().collection(USER_COLLECTION_NAME).findOne({ _id: ObjectId.createFromHexString(userId) })
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+const getAllUser = async () => {
+  try {
+    return await GET_DB().collection(USER_COLLECTION_NAME).find({}).toArray()
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+const softDeleteUser = async (userId) => {
+  try {
+    return await GET_DB().collection(USER_COLLECTION_NAME).updateOne({ _id: ObjectId.createFromHexString(userId) }, { $set: { _destroy: true } })
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
   createNew,
-  getUserByEmail
+  getUserByEmail,
+  updateUserById,
+  getUserById,
+  getAllUser,
+  softDeleteUser
 }
+

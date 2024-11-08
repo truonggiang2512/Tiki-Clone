@@ -5,5 +5,5 @@ import { userRoutes } from './userRoutes';
 
 const Router = express.Router();
 Router.use('/user', userRoutes)
-Router.use('/product', authenticateJWT, productRoutes)
+Router.use('/product', productRoutes)
 export const APIs_V1 = Router

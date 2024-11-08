@@ -103,7 +103,71 @@ const signIn = async (req, res, next) => {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message))
   }
 }
+const updateOne = async (req, res, next) => {
+  const correctCondition = Joi.object({
+    username: Joi.string()
+      .min(3)
+      .max(30)
+      .messages({
+        'string.base': 'Tên đăng nhập phải là một chuỗi.',
+        'string.empty': 'Tên đăng nhập không được để trống.',
+        'string.min': 'Tên đăng nhập phải có ít nhất 3 ký tự.',
+        'string.max': 'Tên đăng nhập không được quá 30 ký tự.',
+      }),
+
+    email: Joi.string()
+      .email()
+      .messages({
+        'string.base': 'Email phải là một chuỗi.',
+        'string.email': 'Email không hợp lệ.',
+        'string.empty': 'Email không được để trống.',
+      }),
+
+    phone_number: Joi.string()
+      .pattern(/^[0-9]{10,15}$/)
+      .messages({
+        'string.base': 'Số điện thoại phải là một chuỗi.',
+        'string.empty': 'Số điện thoại không được để trống.',
+        'string.pattern.base': 'Số điện thoại không hợp lệ.',
+      }),
+
+    address: Joi.string()
+      .max(255)
+      .messages({
+        'string.base': 'Địa chỉ phải là một chuỗi.',
+        'string.empty': 'Địa chỉ không được để trống.',
+        'string.max': 'Địa chỉ không được quá 255 ký tự.',
+      }),
+
+    role: Joi.string()
+      .valid('seller', 'buyer')
+
+      .messages({
+        'string.base': 'Vai trò phải là một chuỗi.',
+        'any.only': 'Vai trò chỉ có thể là "seller" hoặc "buyer".',
+        'string.empty': 'Vai trò không được để trống.',
+      }),
+
+    status: Joi.string()
+      .valid('active', 'inactive')
+
+      .messages({
+        'string.base': 'Trạng thái phải là một chuỗi.',
+        'any.only': 'Trạng thái chỉ có thể là "active" hoặc "inactive".',
+        'string.empty': 'Trạng thái không được để trống.',
+      }),
+
+    updatedAt: Joi.date().timestamp('javascript').default(() => Date.now()),
+  }).min(1);
+  try {
+    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    next();
+  } catch (error) {
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
+  }
+}
 export const userValidation = {
   createNew,
-  signIn
+  signIn,
+  updateOne,
 }
