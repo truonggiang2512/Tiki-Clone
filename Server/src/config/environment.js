@@ -5,6 +5,6 @@ export const env = {
   APP_PORT: process.env.APP_PORT,
   APP_HOST: process.env.APP_HOST,
   AUTHOR: process.env.AUTHOR,
-  BUILD_MODE: process.env.BUILD_MODE
-
+  BUILD_MODE: process.env.BUILD_MODE,
+  SECRET_JWT_KEY: process.env.JWT_SECRET
 }

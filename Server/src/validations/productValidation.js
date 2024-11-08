@@ -1,4 +1,4 @@
-import Joi, { string } from "joi";
+import Joi from "joi";
 import { StatusCodes } from 'http-status-codes'
 import ApiError from "~/utils/ApiError";
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from "~/models/validator";
@@ -14,6 +14,7 @@ const createNew = async (req, res, next) => {
     status: Joi.string().valid('in stock', 'out of stock').default('in stock'),
     categoryId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE).optional(),
     createdAt: Joi.date().timestamp('javascript').default(() => Date.now()),
+    role: Joi.string().required().valid('buyer', 'seller'),
     updatedAt: Joi.date().timestamp('javascript').allow(null).default(() => null),
   })
   try {

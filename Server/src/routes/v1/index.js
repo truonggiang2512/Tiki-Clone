@@ -1,4 +1,5 @@
 import express from 'express'
+import { authenticateJWT } from '~/middlewares/authenticateMiddleware';
 import { productRoutes } from './productRoutes';
 import { userRoutes } from './userRoutes';
 
