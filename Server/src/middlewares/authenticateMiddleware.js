@@ -27,3 +27,11 @@ export const authorizeAdmin = (req, res, next) => {
   }
   next();
 };
+
+// Middleware to authorize only sellers
+export const authorizeSeller = (req, res, next) => {
+  if (req.user.role !== 'seller') {
+    return res.status(StatusCodes.FORBIDDEN).json({ message: 'Seller access required' });
+  }
+  next();
+};
