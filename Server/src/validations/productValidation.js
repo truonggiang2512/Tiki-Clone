@@ -5,7 +5,6 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from "~/models/validator";
 
 const createNew = async (req, res, next) => {
   const correctCondition = Joi.object({
-    sellerId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     name: Joi.string().required().min(3).max(50).trim().strict(),
     desc: Joi.string().required().min(3).max(255).trim().strict(),
     price: Joi.number().required(),
@@ -14,7 +13,6 @@ const createNew = async (req, res, next) => {
     status: Joi.string().valid('in stock', 'out of stock').default('in stock'),
     categoryId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE).optional(),
     createdAt: Joi.date().timestamp('javascript').default(() => Date.now()),
-    role: Joi.string().required().valid('buyer', 'seller'),
     updatedAt: Joi.date().timestamp('javascript').allow(null).default(() => null),
   })
   try {
@@ -30,7 +28,6 @@ const createNew = async (req, res, next) => {
 
 const updateProduct = async (req, res, next) => {
   const updateCondition = Joi.object({
-    sellerId: Joi.string().optional().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     name: Joi.string().optional().min(3).max(50).trim().strict(),
     desc: Joi.string().optional().min(3).max(255).trim().strict(),
     price: Joi.number().optional(),

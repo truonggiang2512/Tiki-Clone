@@ -2,11 +2,14 @@ import { ObjectId } from "mongodb"
 import { productModel } from "~/models/productModel"
 import { slugify } from "~/utils/formatter"
 
-const createNew = async (reqBody) => {
+const createNew = async (req) => {
   try {
+    const reqBody = req.body;
+    const sellerId = req.user.useId;
     // xu ly logic du lieu tuy dac thu du an 
     const newProduct = {
       ...reqBody,
+      sellerId,
       finalPrice: reqBody.discount ? reqBody.price - (reqBody.price * (reqBody.discount / 100)) : reqBody.price,
       updatedAt: null,
       slug: slugify(reqBody.name),
@@ -28,11 +31,25 @@ const createNew = async (reqBody) => {
 const getAll = async () => {
   try {
     const getAllProduct = await productModel.getAllProduct();
-    return getAllProduct.filter((item) => item._destroy == false)
+    return getAllProduct.filter((item) => item._destroy !== true).map((item) => {
+      const { _destroy, ...res } = item
+      return res
+    })
   } catch (error) {
     throw error
   }
-
+}
+const getAllSellerProduct = async (req) => {
+  try {
+    const { userId } = req.user;
+    const getAllProduct = await productModel.getSellerProduct(userId);
+    return getAllProduct.filter((item) => item._destroy !== true).map((item) => {
+      const { _destroy, ...res } = item
+      return res
+    })
+  } catch (error) {
+    throw error
+  }
 }
 const editOneById = async (reqBody, productId) => {
   try {
@@ -63,6 +80,7 @@ const deleteOne = async (productId) => {
 }
 export const productService = {
   getAll,
+  getAllSellerProduct,
   createNew,
   editOneById,
   deleteOne,

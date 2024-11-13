@@ -14,7 +14,6 @@ const PRODUCT_COLLECTION_SCHEMA = Joi.object({
   stock: Joi.number().required(),
   createdAt: Joi.date().timestamp('javascript').default(() => Date.now()),
   updatedAt: Joi.date().timestamp('javascript').allow(null).default(() => null),
-  role: Joi.string().required().valid('buyer', 'seller'),
   status: Joi.string().valid('in stock', 'out of stock').default('in stock'),
   categoryId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE).optional(),
   _destroy: Joi.boolean().default(false),
@@ -45,6 +44,14 @@ const getAllProduct = async () => {
     throw new Error(error)
   }
 }
+const getSellerProduct = async (userId) => {
+  try {
+    const result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).find({ seller_id: userId }).toArray()
+    return result;
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 const editOneById = async (data, productId) => {
   try {
     const result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).updateOne({ _id: ObjectId.createFromHexString(productId) }, { $set: data })
@@ -59,5 +66,6 @@ export const productModel = {
   createNew,
   findOneById,
   getAllProduct,
-  editOneById
+  editOneById,
+  getSellerProduct
 }

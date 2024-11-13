@@ -6,7 +6,7 @@ import ApiError from '~/utils/ApiError'
 const createNew = async (req, res, next) => {
   try {
     // dieu huong du lieu sang tang service
-    const createdProduct = await productService.createNew(req.body)
+    const createdProduct = await productService.createNew(req)
     res.status(StatusCodes.CREATED).json(createdProduct)
   } catch (error) {
     next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.message));
@@ -16,6 +16,14 @@ const createNew = async (req, res, next) => {
 const getAll = async (req, res, next) => {
   try {
     const getAllProduct = await productService.getAll();
+    res.status(StatusCodes.OK).json(getAllProduct);
+  } catch (error) {
+    next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.message))
+  }
+}
+const getAllSellerProduct = async (req, res, next) => {
+  try {
+    const getAllProduct = await productService.getAllSellerProduct(req);
     res.status(StatusCodes.OK).json(getAllProduct);
   } catch (error) {
     next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.message))
@@ -41,5 +49,6 @@ export const productController = {
   getAll,
   createNew,
   editOneById,
-  deleteOne
+  deleteOne,
+  getAllSellerProduct
 }
