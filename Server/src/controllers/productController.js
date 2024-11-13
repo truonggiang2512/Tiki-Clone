@@ -45,10 +45,19 @@ const deleteOne = async (req, res, next) => {
     next(new ApiError(StatusCodes.NO_CONTENT, error.message))
   }
 }
+const getDetailProduct = async (req, res, next) => {
+  try {
+    const data = await productService.getDetailProduct(req.params.id)
+    res.status(StatusCodes.OK).json({ data })
+  } catch (error) {
+    next(new ApiError(StatusCodes.NO_CONTENT, error.message))
+  }
+}
 export const productController = {
   getAll,
   createNew,
   editOneById,
   deleteOne,
-  getAllSellerProduct
+  getAllSellerProduct,
+  getDetailProduct
 }

@@ -67,16 +67,29 @@ const editOneById = async (reqBody, productId) => {
 }
 const deleteOne = async (productId) => {
   try {
-    const getProductById = await productModel.findOneById(ObjectId.createFromHexString(productId))
+    // const getProductById = await productModel.findOneById(ObjectId.createFromHexString(productId))
     const newProduct = {
-      ...getProductById,
+      // ...getProductById,
       _destroy: true,
     }
     return await productModel.editOneById(newProduct, productId)
   } catch (error) {
     throw error
   }
-
+}
+const getDetailProduct = async (productId) => {
+  try {
+    const { product: data, relatedProducts: relatedData } = await productModel.getDetailProduct(ObjectId.createFromHexString(productId))
+    const product = { ...data };
+    delete product._destroy;
+    const relatedProduct = relatedData.map((item) => {
+      const { _destroy, ...res } = item;
+      return res;
+    })
+    return { product, relatedProduct }
+  } catch (error) {
+    throw error
+  }
 }
 export const productService = {
   getAll,
@@ -84,5 +97,6 @@ export const productService = {
   createNew,
   editOneById,
   deleteOne,
+  getDetailProduct
 }
 

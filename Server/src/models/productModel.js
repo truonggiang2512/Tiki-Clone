@@ -26,13 +26,22 @@ const createNew = async (data) => {
   }
 }
 
-const findOneById = async (id) => {
+const getDetailProduct = async (id) => {
   try {
-    const result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).findOne({
+    const product = await GET_DB().collection(PRODUCT_COLLECTION_NAME).findOne({
       _id: id
     })
-    return result
+    // Find related products from the same shop/seller, excluding the current product
+    const relatedProducts = await GET_DB().collection(PRODUCT_COLLECTION_NAME)
+      .find({
+        sellerId: product.sellerId,
+        _id: { $ne: id } // Exclude the current product
+      })
+      .limit(5) // Limit the number of related products for simplicity
+      .toArray();
+    return { product, relatedProducts }
   } catch (error) {
+    console.log(error)
     throw new Error(error)
   }
 }
@@ -46,7 +55,7 @@ const getAllProduct = async () => {
 }
 const getSellerProduct = async (userId) => {
   try {
-    const result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).find({ seller_id: userId }).toArray()
+    const result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).find({ sellerId: userId }).toArray()
     return result;
   } catch (error) {
     throw new Error(error)
@@ -64,7 +73,7 @@ export const productModel = {
   PRODUCT_COLLECTION_NAME,
   PRODUCT_COLLECTION_SCHEMA,
   createNew,
-  findOneById,
+  getDetailProduct,
   getAllProduct,
   editOneById,
   getSellerProduct
