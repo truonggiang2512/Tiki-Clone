@@ -26,23 +26,18 @@ const signIn = async (req, res, next) => {
 }
 const updateUserById = async (req, res, next) => {
   try {
-    const userId = req.params.userId;
-    const user = await userModel.updateUserById(req.body, userId)
+    const user = await userService.updateUserById(req)
     res.status(StatusCodes.OK).json({ user })
   } catch (error) {
-    next(new ApiError(StatusCodes.BAD_REQUEST, error.message))
+    next(error)
   }
 }
 const getDetailUser = async (req, res, next) => {
   try {
-    const userId = req.params.userId
-    if (req.user.userId !== userId) {
-      return next(new ApiError(StatusCodes.FORBIDDEN, "Unauthorized action"));
-    }
-    const user = await userService.getUserById(userId)
+    const user = await userService.getUserById(req)
     res.status(StatusCodes.OK).json({ user })
   } catch (error) {
-    next(new ApiError(StatusCodes.BAD_REQUEST, error.message))
+    next(error)
   }
 }
 const getAllUser = async (req, res, next) => {
