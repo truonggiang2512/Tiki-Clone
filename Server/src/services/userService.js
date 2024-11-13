@@ -4,6 +4,7 @@ import { userModel } from "~/models/userModel";
 import ApiError from "~/utils/ApiError";
 import jwt from "jsonwebtoken"
 import { env } from "~/config/environment";
+import { userHelper } from "~/utils/userHelper";
 async function hashPassword(password) {
   const salt = await bcrypt.genSalt()
   const hashedPassword = await bcrypt.hash(password, salt);
@@ -17,6 +18,7 @@ const createNew = async (reqBody) => {
       passwordHash: hashedPassword,
       updatedAt: null,
       status: 'active',
+      role: "buyer",
       _destroy: false
     }
     // Xoa field password de thay the bang field passwordHash
@@ -29,9 +31,9 @@ const createNew = async (reqBody) => {
 }
 const signIn = async (reqBody) => {
   try {
-    const { password, email } = reqBody
-    const user = await userModel.getUserByEmail(email)
-    if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
+    const { password, email } = reqBody;
+    const user = await userModel.getUserByEmail(email);
+    if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
     const isPasswordCorrect = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordCorrect) {
       throw new Error('Incorrect password');
@@ -49,12 +51,24 @@ const signIn = async (reqBody) => {
     throw error
   }
 }
-const getUserById = async (userId) => {
+const updateUserById = async (req) => {
   try {
+    const userId = req.params.userId;
+    const userIdToken = req.user.userId;
+    await userHelper.authorizeUser(userIdToken, userId)
+    return await userModel.updateUserById(req.body, userId)
+  } catch (error) {
+    throw error
+  }
+}
+const getUserById = async (req) => {
+  try {
+    const { userId } = req.params;
+    const userIdToken = req.user.userId
     const user = await userModel.getUserById(userId);
-    if (!user) throw new ApiError(StatusCodes.NOT_FOUND, "user not found")
-    const userData = { ...user };
+    await userHelper.authorizeUser(userIdToken, userId)
 
+    const userData = { ...user };
     // Remove sensitive fields
     delete userData.passwordHash;
     delete userData._destroy;
@@ -84,4 +98,5 @@ export const userService = {
   signIn,
   getUserById,
   getAllUser,
+  updateUserById
 }

@@ -48,14 +48,14 @@ const createNew = async (req, res, next) => {
         'string.max': 'Địa chỉ không được quá 255 ký tự.',
       }),
 
-    role: Joi.string()
-      .valid('seller', 'buyer')
-      .required()
-      .messages({
-        'string.base': 'Vai trò phải là một chuỗi.',
-        'string.valid': 'Vai trò chỉ có thể là "seller" hoặc "buyer".',
-        'string.empty': 'Vai trò không được để trống.',
-      }),
+    // role: Joi.string()
+    //   .valid('seller', 'buyer')
+    //   .required()
+    //   .messages({
+    //     'string.base': 'Vai trò phải là một chuỗi.',
+    //     'string.valid': 'Vai trò chỉ có thể là "seller" hoặc "buyer".',
+    //     'string.empty': 'Vai trò không được để trống.',
+    //   }),
     createdAt: Joi.date().timestamp('javascript').default(() => Date.now()),
     updatedAt: Joi.date().timestamp('javascript').allow(null).default(() => null),
     status: Joi.string()
@@ -139,14 +139,6 @@ const updateOne = async (req, res, next) => {
         'string.max': 'Địa chỉ không được quá 255 ký tự.',
       }),
 
-    role: Joi.string()
-      .valid('seller', 'buyer')
-
-      .messages({
-        'string.base': 'Vai trò phải là một chuỗi.',
-        'any.only': 'Vai trò chỉ có thể là "seller" hoặc "buyer".',
-        'string.empty': 'Vai trò không được để trống.',
-      }),
 
     status: Joi.string()
       .valid('active', 'inactive')
