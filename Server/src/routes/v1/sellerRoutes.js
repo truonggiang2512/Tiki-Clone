@@ -4,10 +4,10 @@ import { authenticateJWT, authorizeSeller } from '~/middlewares/authenticateMidd
 import { productValidation } from '~/validations/productValidation'
 const Router = express.Router()
 
-Router.route('/')
-  .get(authenticateJWT, authorizeSeller, productController.getAll)
+Router.route('/products')
+  .get(authenticateJWT, authorizeSeller, productController.getAllSellerProduct)
   .post(authenticateJWT, authorizeSeller, productValidation.createNew, productController.createNew)
-Router.route('/:id')
+Router.route('/products/:id')
   .delete(authenticateJWT, authorizeSeller, productController.deleteOne)
-  .put(productValidation.updateProduct, productController.editOneById)
-export const productRoutes = Router
+  .put(authenticateJWT, authorizeSeller, productValidation.updateProduct, productController.editOneById)
+export const sellerRoutes = Router

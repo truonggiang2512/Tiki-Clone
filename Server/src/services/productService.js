@@ -5,7 +5,7 @@ import { slugify } from "~/utils/formatter"
 const createNew = async (req) => {
   try {
     const reqBody = req.body;
-    const sellerId = req.user.useId;
+    const sellerId = req.user.userId;
     // xu ly logic du lieu tuy dac thu du an 
     const newProduct = {
       ...reqBody,
@@ -21,9 +21,10 @@ const createNew = async (req) => {
 
     // lay collection product sau khi goi 
     const getNewProduct = await productModel.findOneById(createdProduct.insertedId)
-    //...
+    const data = { ...getNewProduct }
+    delete data._destroy
     // lam them cac xu ly locigc khac voi cac collection khac tuy vao du an 
-    return getNewProduct
+    return data
   } catch (error) {
     throw error
   }
@@ -67,9 +68,7 @@ const editOneById = async (reqBody, productId) => {
 }
 const deleteOne = async (productId) => {
   try {
-    // const getProductById = await productModel.findOneById(ObjectId.createFromHexString(productId))
     const newProduct = {
-      // ...getProductById,
       _destroy: true,
     }
     return await productModel.editOneById(newProduct, productId)

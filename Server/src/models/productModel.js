@@ -41,7 +41,6 @@ const getDetailProduct = async (id) => {
       .toArray();
     return { product, relatedProducts }
   } catch (error) {
-    console.log(error)
     throw new Error(error)
   }
 }
@@ -69,6 +68,16 @@ const editOneById = async (data, productId) => {
     throw new Error(error)
   }
 }
+const findOneById = async (id) => {
+  try {
+    const result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).findOne({
+      _id: id
+    })
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 export const productModel = {
   PRODUCT_COLLECTION_NAME,
   PRODUCT_COLLECTION_SCHEMA,
@@ -76,5 +85,6 @@ export const productModel = {
   getDetailProduct,
   getAllProduct,
   editOneById,
-  getSellerProduct
+  getSellerProduct,
+  findOneById
 }
