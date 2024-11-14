@@ -1,4 +1,5 @@
 import { StatusCodes } from "http-status-codes"
+import { cartService } from "~/services/cartService"
 import ApiError from "~/utils/ApiError"
 
 const getCart = async (req, res, next) => {
@@ -10,7 +11,12 @@ const getCart = async (req, res, next) => {
   }
 }
 const addToCart = async (req, res, next) => {
-
+  try {
+    const data = await cartService.addToCart(req)
+    res.status(StatusCodes.OK).json(data)
+  } catch (error) {
+    throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.messages)
+  }
 }
 const updateCartItem = async (req, res, next) => {
 

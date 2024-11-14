@@ -1,6 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import Joi from "joi"
 import { OBJECT_ID_RULE } from "~/models/validator";
+import ApiError from "~/utils/ApiError";
 
 const createNew = async (req, res, next) => {
   const cartItemSchema = Joi.object({
@@ -23,31 +24,12 @@ const createNew = async (req, res, next) => {
       'date.base': 'AddedAt must be a valid date',
     })
   });
-
   // Validation schema cho giỏ hàng
   const correctCondition = Joi.object({
-    userId: Joi.string().required().pattern(OBJECT_ID_RULE).messages({
-      'any.required': 'User ID is required',
-      'string.pattern.base': 'User ID must be a valid MongoDB ObjectId',
-    }),
     items: Joi.array().items(cartItemSchema).min(1).required().messages({
       'array.min': 'Cart must contain at least one item',
       'any.required': 'Items are required',
     }),
-    totalQuantity: Joi.number().integer().min(1).required().messages({
-      'any.required': 'Total quantity is required',
-      'number.base': 'Total quantity must be a number',
-      'number.min': 'Total quantity must be at least 1',
-      'number.integer': 'Total quantity must be an integer',
-    }),
-    totalPrice: Joi.number().positive().required().messages({
-      'any.required': 'Total price is required',
-      'number.base': 'Total price must be a number',
-      'number.positive': 'Total price must be a positive value',
-    }),
-    updatedAt: Joi.date().optional().messages({
-      'date.base': 'UpdatedAt must be a valid date',
-    })
   });
 
   try {
