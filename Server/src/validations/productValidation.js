@@ -35,7 +35,7 @@ const updateProduct = async (req, res, next) => {
     stock: Joi.number().optional(),
     status: Joi.string().valid('in stock', 'out of stock').optional(),
     categoryId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE).optional(),
-    updatedAt: Joi.date().timestamp('javascript').default(() => Date.now())
+    updatedAt: Joi.date().timestamp('javascript').allow(null).default(() => Date.now())
   });
 
   try {
