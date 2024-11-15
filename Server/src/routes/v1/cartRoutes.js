@@ -5,10 +5,10 @@ import { cartValidation } from "~/validations/cartValidation"
 const Router = express.Router()
 
 Router.route('/')
-  .get(authenticateJWT, cartController.getCart)           // Lấy giỏ hàng của user
+  .get(authenticateJWT, cartController.getCartByUserId)           // Lấy giỏ hàng của user
   .post(authenticateJWT, cartValidation.createNew, cartController.addToCart)        // Thêm sản phẩm vào giỏ hàng
-
-Router.route('/:productId')
-  .put(authenticateJWT, cartController.updateCartItem)    // Cập nhật số lượng sản phẩm
-  .delete(authenticateJWT, cartController.removeCartItem) // Xóa sản phẩm khỏi giỏ hàng
+Router.route('/remove-item')
+  .delete(authenticateJWT, cartController.removeItemFromCart) // Xóa sản phẩm khỏi giỏ hàng
+Router.route('/update-quantity')
+  .put(authenticateJWT, cartController.updateItemQuantity)
 export const cartRoutes = Router

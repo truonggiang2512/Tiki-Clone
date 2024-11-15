@@ -33,9 +33,9 @@ const upsertCart = async (userId, cartData) => {
     throw new Error(error)
   }
 }
-const findOne = async (userId) => {
+const getCartByUserId = async (userId) => {
   try {
-    return await GET_DB().collection(CART_COLLECTION_NAME).findOne({ userId: ObjectId.createFromHexString(userId) })
+    return await GET_DB().collection(CART_COLLECTION_NAME).findOne({ userId })
   } catch (error) {
     throw new Error(error)
   }
@@ -46,5 +46,5 @@ export const cartModel = {
   CART_COLLECTION_NAME,
   CART_COLLECTION_SCHEMA,
   upsertCart,
-  findOne
+  getCartByUserId
 }

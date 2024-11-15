@@ -2,32 +2,45 @@ import { StatusCodes } from "http-status-codes"
 import { cartService } from "~/services/cartService"
 import ApiError from "~/utils/ApiError"
 
-const getCart = async (req, res, next) => {
+const getCartByUserId = async (req, res, next) => {
   try {
-
-    res.status(StatusCodes.OK).json()
+    const { userId } = req.user
+    const data = await cartService.getCartByUserId(userId)
+    res.status(StatusCodes.OK).json({ data })
   } catch (error) {
-    throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.messages)
+    next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.messages))
   }
 }
 const addToCart = async (req, res, next) => {
   try {
     const data = await cartService.addToCart(req)
-    res.status(StatusCodes.OK).json(data)
+    res.status(StatusCodes.CREATED).json(data)
   } catch (error) {
-    throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.messages)
+    next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.messages))
+
   }
 }
-const updateCartItem = async (req, res, next) => {
+const updateItemQuantity = async (req, res, next) => {
+  try {
+    const data = await cartService.updateItemQuantity(req)
+    res.status(StatusCodes.OK).json({ data })
+  } catch (error) {
+    next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.messages))
 
+  }
 }
-const removeCartItem = async (req, res, next) => {
-
+const removeItemFromCart = async (req, res, next) => {
+  try {
+    const data = await cartService.removeItemFromCart(req)
+    res.status(StatusCodes.OK).json({ data })
+  } catch (error) {
+    next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.messages))
+  }
 }
 
 export const cartController = {
-  getCart,
+  getCartByUserId,
   addToCart,
-  updateCartItem,
-  removeCartItem
+  updateItemQuantity,
+  removeItemFromCart
 }
