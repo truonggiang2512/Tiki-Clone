@@ -93,7 +93,6 @@ const addToCart = async (req) => {
     // Tính toán tổng số lượng và tổng tiền
     const { totalQuantity, grandTotal } = calculateCartData(items);
 
-    // Gọi model để upsert giỏ hàng
     const cartData = {
       userId,
       items,
