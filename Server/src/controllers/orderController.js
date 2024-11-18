@@ -1,31 +1,50 @@
 import { StatusCodes } from "http-status-codes";
+import { orderService } from "~/services/orderService";
+import ApiError from "~/utils/ApiError";
 
-const getOrdersByUser = async (req, res) => {
+const createNew = async (req, res, next) => {
   try {
-    const orders = await orderService.getOrdersByUserId(req.user._id);
-    res.status(StatusCodes.OK).json(orders);
+    await orderService.createOrder(req)
+    res.status(StatusCodes.CREATED).json("Order successfully")
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error fetching orders' });
+    next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error))
   }
 }
-
-const getOrdersBySeller = async (req, res) => {
+const getOrdersByUser = async (req, res, next) => {
   try {
-    const orders = await orderService.getOrdersBySellerId(req.user._id);
+    const orders = await orderService.getOrdersByUserId(req.user.userId);
     res.status(StatusCodes.OK).json(orders);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error fetching orders' });
+    next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error))
   }
 }
-
-const getOrderById = async (req, res) => {
+const getOrderById = async (req, res, next) => {
   try {
-    const order = await orderService.getOrderById(req.params.id);
+    const order = await orderService.getOrderById(req.params.orderId);
     res.status(StatusCodes.OK).json(order);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error fetching order details' });
+    next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error))
   }
 }
+const cancelOrder = async (req, res, next) => {
+  try {
+    await orderService.cancelOrder(req.params.orderId)
+    res.status(StatusCodes.OK).json("Cancel Successfully");
+  } catch (error) {
+    next(error)
+  }
+}
+// Fetch orders by seller ID for sellers
+const getOrdersBySeller = async (req, res, next) => {
+  try {
+    const orders = await orderService.getOrdersBySellerId(req.user.userId);
+    res.status(StatusCodes.OK).json(orders);
+  } catch (error) {
+    next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error))
+
+  }
+}
+
 
 const updateOrderStatus = async (req, res) => {
   try {
@@ -36,9 +55,11 @@ const updateOrderStatus = async (req, res) => {
   }
 }
 
-export const ordersController = {
+export const orderController = {
   getOrdersByUser,
   getOrdersBySeller,
   getOrderById,
-  updateOrderStatus
+  updateOrderStatus,
+  createNew,
+  cancelOrder
 }
