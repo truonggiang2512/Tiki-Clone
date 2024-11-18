@@ -1,3 +1,14 @@
+import { orderModel } from "~/models/orderModel";
+
+const calculateProductData = (items) => {
+  let grandTotal = 0;
+
+  items.forEach(item => {
+    grandTotal += item.price * item.quantity;
+  });
+
+  return { grandTotal };
+};
 const getOrdersByUserId = async (userId) => {
   try {
     const db = GET_DB();
@@ -45,11 +56,31 @@ const updateOrderStatus = async (orderId, status) => {
   }
 }
 
+const createOrder = async (req) => {
+  const { userId } = req.user
+  const { items } = req.body
+  const { grandTotal } = calculateProductData(items);
+  try {
+    const reqData = {
+      ...req.body,
+      userId,
+      totalPrice: grandTotal,
+      orderDate: new Date().getTime(),
+      status: "processing"
+    }
+    await orderModel.ORDER_COLLECTION_SCHEMA.validateAsync(reqData, { abortEarly: false })
+
+    return await orderModel.createOrder(reqData)
+  } catch (error) {
+    throw error
+  }
+}
 
 
 export const orderService = {
   getOrderById,
   getOrdersBySellerId,
   getOrdersByUserId,
-  updateOrderStatus
+  updateOrderStatus,
+  createOrder
 }

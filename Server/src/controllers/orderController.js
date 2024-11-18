@@ -1,5 +1,15 @@
 import { StatusCodes } from "http-status-codes";
+import { orderService } from "~/services/orderService";
+import ApiError from "~/utils/ApiError";
 
+const createNew = async (req, res, next) => {
+  try {
+    await orderService.createOrder(req)
+    res.status(StatusCodes.CREATED).json("Order successfully")
+  } catch (error) {
+    next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error))
+  }
+}
 const getOrdersByUser = async (req, res) => {
   try {
     const orders = await orderService.getOrdersByUserId(req.user._id);
@@ -36,9 +46,10 @@ const updateOrderStatus = async (req, res) => {
   }
 }
 
-export const ordersController = {
+export const orderController = {
   getOrdersByUser,
   getOrdersBySeller,
   getOrderById,
-  updateOrderStatus
+  updateOrderStatus,
+  createNew
 }
