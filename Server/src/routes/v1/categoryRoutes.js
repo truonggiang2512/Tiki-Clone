@@ -8,5 +8,6 @@ Router.route('/')
   .get(categoryController.getAllCategory)
   .post(authenticateJWT, authorizeAdmin, categoryValidation.createNew, categoryController.createNew)
 Router.route('/:categoryId')
-  .delete(authenticateJWT, authorizeAdmin, categoryController.deleteOne).put(authenticateJWT, authorizeAdmin, categoryValidation.createNew, categoryController.putOne)
+  .delete(authenticateJWT, authorizeAdmin, categoryController.deleteOne)
+  .put(authenticateJWT, authorizeAdmin, categoryValidation.createNew, categoryController.putOne)
 export const categoryRoutes = Router

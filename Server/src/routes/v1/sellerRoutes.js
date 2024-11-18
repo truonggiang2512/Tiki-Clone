@@ -8,6 +8,7 @@ Router.route('/products')
   .get(authenticateJWT, authorizeSeller, productController.getAllSellerProduct)
   .post(authenticateJWT, authorizeSeller, productValidation.createNew, productController.createNew)
 Router.route('/products/:id')
+  .get(authenticateJWT, authorizeSeller, productController.getDetailProduct)
   .delete(authenticateJWT, authorizeSeller, productController.deleteOne)
   .put(authenticateJWT, authorizeSeller, productValidation.updateProduct, productController.editOneById)
 export const sellerRoutes = Router
