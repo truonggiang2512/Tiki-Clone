@@ -34,13 +34,14 @@ const cancelOrder = async (req, res, next) => {
     next(error)
   }
 }
-
-const getOrdersBySeller = async (req, res) => {
+// Fetch orders by seller ID for sellers
+const getOrdersBySeller = async (req, res, next) => {
   try {
-    const orders = await orderService.getOrdersBySellerId(req.user._id);
+    const orders = await orderService.getOrdersBySellerId(req.user.userId);
     res.status(StatusCodes.OK).json(orders);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error fetching orders' });
+    next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error))
+
   }
 }
 

@@ -51,12 +51,53 @@ const deleteOrder = async (orderId) => {
     throw new Error(error)
   }
 }
-
+const getOrdersBySellerId = async (sellerId) => {
+  try {
+    const orders = await GET_DB().collection(ORDER_COLLECTION_NAME).aggregate([
+      {
+        $unwind: "$items" // Break down each order's items array
+      },
+      {
+        $lookup: {
+          from: "products", // Join with the products collection
+          localField: "items.productId", // Match items.productId in orders
+          foreignField: "_id", // With _id in products
+          as: "productDetails"
+        }
+      },
+      {
+        $unwind: "$productDetails" // Flatten productDetails
+      },
+      {
+        $match: {
+          "productDetails.sellerId": sellerId // Match sellerId
+        }
+      },
+      {
+        $group: {
+          _id: "$_id", // Regroup by order ID
+          items: { $push: "$items" }, // Reconstruct items array
+          totalPrice: { $first: "$totalPrice" },
+          userId: { $first: "$userId" },
+          orderDate: { $first: "$orderDate" },
+          status: { $first: "$status" }
+        }
+      },
+      {
+        $sort: { orderDate: -1 } // Sort by newest orders first
+      }
+    ]).toArray();
+    return orders;
+  } catch (error) {
+    throw new Error('Error fetching orders for seller: ' + error.message);
+  }
+}
 export const orderModel = {
   ORDER_COLLECTION_SCHEMA,
   ORDER_COLLECTION_NAME,
   createOrder,
   getOrdersByUserId,
   getOrderById,
-  deleteOrder
+  deleteOrder,
+  getOrdersBySellerId
 }

@@ -22,9 +22,7 @@ const getOrdersByUserId = async (userId) => {
 // Fetch orders by seller ID for sellers
 const getOrdersBySellerId = async (sellerId) => {
   try {
-    const db = GET_DB();
-    const orders = await db.collection(ORDER_COLLECTION_NAME).find({ 'products.sellerId': new ObjectId(sellerId) }).toArray();
-    return orders;
+    return await orderModel.getOrdersBySellerId(sellerId);
   } catch (error) {
     throw new Error('Error fetching orders for seller: ' + error.message);
   }
