@@ -1,4 +1,5 @@
 import { StatusCodes } from "http-status-codes";
+import { ObjectId } from "mongodb";
 import { orderModel } from "~/models/orderModel";
 import ApiError from "~/utils/ApiError";
 
@@ -59,7 +60,7 @@ const createOrder = async (req) => {
   try {
     const reqData = {
       ...req.body,
-      userId,
+      userId: ObjectId(userId),
       totalPrice: grandTotal,
       orderDate: new Date().getTime(),
       status: "processing"

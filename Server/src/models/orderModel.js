@@ -1,27 +1,30 @@
 import Joi from "joi"
 import { ObjectId } from "mongodb"
 import { GET_DB } from "~/config/mongodb"
+import { OBJECT_ID_RULE } from "./validator";
 
 const ORDER_COLLECTION_NAME = "orders"
 const ORDER_COLLECTION_SCHEMA = Joi.object({
-  userId: Joi.string().required(),
+  userId: Joi.string().required().regex(OBJECT_ID_RULE, 'object Id'),
+
   items: Joi.array()
     .items(
       Joi.object({
-        productId: Joi.string().required(),
+        productId: Joi.string().required().regex(OBJECT_ID_RULE, 'object Id'),
         quantity: Joi.number().integer().min(1).required(),
         price: Joi.number().positive().required(),
       }).required()
     )
     .min(1)
-    .required()
-  ,
+    .required(),
+
   totalPrice: Joi.number().positive().required(),
   orderDate: Joi.date().required(),
+
   status: Joi.string()
     .valid("processing", "shipped", "canceled", "delivered")
-    .required()
-})
+    .required(),
+});
 const createOrder = async (order) => {
   try {
     return GET_DB().collection(ORDER_COLLECTION_NAME).insertOne(order)
@@ -56,6 +59,11 @@ const getOrdersBySellerId = async (sellerId) => {
     const orders = await GET_DB().collection(ORDER_COLLECTION_NAME).aggregate([
       {
         $unwind: "$items" // Break down each order's items array
+      },
+      {
+        $addFields: {
+          "items.productId": { $toObjectId: "$items.productId" }
+        }
       },
       {
         $lookup: {
