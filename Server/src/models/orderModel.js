@@ -29,10 +29,18 @@ const createOrder = async (order) => {
   }
 }
 
+const getOrdersByUserId = async (userId) => {
+  try {
+    return await GET_DB().collection(ORDER_COLLECTION_NAME).find({ userId }).toArray()
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 
 
 export const orderModel = {
   ORDER_COLLECTION_SCHEMA,
   ORDER_COLLECTION_NAME,
-  createOrder
+  createOrder,
+  getOrdersByUserId
 }

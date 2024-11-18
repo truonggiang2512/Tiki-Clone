@@ -10,12 +10,12 @@ const createNew = async (req, res, next) => {
     next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error))
   }
 }
-const getOrdersByUser = async (req, res) => {
+const getOrdersByUser = async (req, res, next) => {
   try {
-    const orders = await orderService.getOrdersByUserId(req.user._id);
+    const orders = await orderService.getOrdersByUserId(req.user.userId);
     res.status(StatusCodes.OK).json(orders);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error fetching orders' });
+    next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error))
   }
 }
 

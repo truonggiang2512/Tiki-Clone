@@ -11,11 +11,9 @@ const calculateProductData = (items) => {
 };
 const getOrdersByUserId = async (userId) => {
   try {
-    const db = GET_DB();
-    const orders = await db.collection(ORDER_COLLECTION_NAME).find({ buyerId: new ObjectId(userId) }).toArray();
-    return orders;
+    return await orderModel.getOrdersByUserId(userId)
   } catch (error) {
-    throw new Error('Error fetching orders for user: ' + error.message);
+    throw error
   }
 }
 
