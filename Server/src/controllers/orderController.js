@@ -28,12 +28,12 @@ const getOrdersBySeller = async (req, res) => {
   }
 }
 
-const getOrderById = async (req, res) => {
+const getOrderById = async (req, res, next) => {
   try {
-    const order = await orderService.getOrderById(req.params.id);
+    const order = await orderService.getOrderById(req.params.orderId);
     res.status(StatusCodes.OK).json(order);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error fetching order details' });
+    next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error))
   }
 }
 

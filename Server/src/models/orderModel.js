@@ -1,4 +1,5 @@
 import Joi from "joi"
+import { ObjectId } from "mongodb"
 import { GET_DB } from "~/config/mongodb"
 
 const ORDER_COLLECTION_NAME = "orders"
@@ -36,11 +37,19 @@ const getOrdersByUserId = async (userId) => {
     throw new Error(error)
   }
 }
+const getOrderById = async (orderId) => {
+  try {
+    return await GET_DB().collection(ORDER_COLLECTION_NAME).findOne({ _id: ObjectId.createFromHexString(orderId) })
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 
 
 export const orderModel = {
   ORDER_COLLECTION_SCHEMA,
   ORDER_COLLECTION_NAME,
   createOrder,
-  getOrdersByUserId
+  getOrdersByUserId,
+  getOrderById
 }

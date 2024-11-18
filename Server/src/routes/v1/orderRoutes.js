@@ -9,7 +9,8 @@ const Router = express.Router()
 Router.route('/')
   .get(authenticateJWT, orderController.getOrdersByUser)
   .post(authenticateJWT, orderValidation.createNew, orderController.createNew) // create an order 
-
+Router.route('/:orderId')
+  .get(authenticateJWT, orderController.getOrderById)
 
 
 export const orderRoutes = Router

@@ -31,11 +31,9 @@ const getOrdersBySellerId = async (sellerId) => {
 // Fetch order by order ID
 const getOrderById = async (orderId) => {
   try {
-    const db = GET_DB();
-    const order = await db.collection(ORDER_COLLECTION_NAME).findOne({ _id: new ObjectId(orderId) });
-    return order;
+    return await orderModel.getOrderById(orderId)
   } catch (error) {
-    throw new Error('Error fetching order details: ' + error.message);
+    throw error
   }
 }
 
