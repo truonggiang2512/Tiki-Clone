@@ -1,4 +1,6 @@
+import { StatusCodes } from "http-status-codes";
 import { orderModel } from "~/models/orderModel";
+import ApiError from "~/utils/ApiError";
 
 const calculateProductData = (items) => {
   let grandTotal = 0;
@@ -71,6 +73,18 @@ const createOrder = async (req) => {
     throw error
   }
 }
+//Cancel an order (if not yet shipped).
+const cancelOrder = async (orderId) => {
+  try {
+    const order = await orderModel.getOrderById(orderId)
+    if (!order) throw new ApiError(StatusCodes.NOT_FOUND, "order not found")
+    const { status } = order
+    if (status !== "processing") throw new ApiError(StatusCodes.BAD_REQUEST, "Only orders with status 'processing' can be deleted.")
+    return await orderModel.deleteOrder(orderId)
+  } catch (error) {
+    throw error
+  }
+}
 
 
 export const orderService = {
@@ -78,5 +92,6 @@ export const orderService = {
   getOrdersBySellerId,
   getOrdersByUserId,
   updateOrderStatus,
-  createOrder
+  createOrder,
+  cancelOrder
 }

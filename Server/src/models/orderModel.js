@@ -44,12 +44,19 @@ const getOrderById = async (orderId) => {
     throw new Error(error)
   }
 }
-
+const deleteOrder = async (orderId) => {
+  try {
+    return await GET_DB().collection(ORDER_COLLECTION_NAME).findOneAndDelete({ _id: ObjectId.createFromHexString(orderId) })
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 
 export const orderModel = {
   ORDER_COLLECTION_SCHEMA,
   ORDER_COLLECTION_NAME,
   createOrder,
   getOrdersByUserId,
-  getOrderById
+  getOrderById,
+  deleteOrder
 }
