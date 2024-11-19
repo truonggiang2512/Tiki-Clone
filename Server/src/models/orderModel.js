@@ -55,8 +55,22 @@ const deleteOrder = async (orderId) => {
     throw new Error(error)
   }
 }
-const getOrdersBySellerId = async (sellerId) => {
+const getOrdersBySellerId = async (sellerId, status = null, startDate = null, endDate = null) => {
   try {
+    const matchConditions = {
+      "productDetails.sellerId": sellerId // Match sellerId
+    };
+
+    if (status) {
+      matchConditions.status = status; // Filter by status if provided
+    }
+
+    if (startDate && endDate) {
+      matchConditions.orderDate = {
+        $gte: new Date(startDate), // Filter by start date
+        $lte: new Date(endDate) // Filter by end date
+      };
+    }
     const orders = await GET_DB().collection(ORDER_COLLECTION_NAME).aggregate([
       {
         $unwind: "$items" // Break down each order's items array
@@ -79,9 +93,7 @@ const getOrdersBySellerId = async (sellerId) => {
         $unwind: "$productDetails" // Flatten productDetails
       },
       {
-        $match: {
-          "productDetails.sellerId": sellerId // Match sellerId
-        }
+        $match: matchConditions
       },
       {
         $group: {
@@ -132,6 +144,7 @@ const filterOrderByQuery = async ({ status, startDate, endDate }) => {
 
   }
 }
+
 export const orderModel = {
   ORDER_COLLECTION_SCHEMA,
   ORDER_COLLECTION_NAME,

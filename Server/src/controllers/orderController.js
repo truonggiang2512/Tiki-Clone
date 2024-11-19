@@ -37,7 +37,7 @@ const cancelOrder = async (req, res, next) => {
 // Fetch orders by seller ID for sellers
 const getOrdersBySeller = async (req, res, next) => {
   try {
-    const orders = await orderService.getOrdersBySellerId(req.user.userId);
+    const orders = await orderService.getOrdersBySellerId(req);
     res.status(StatusCodes.OK).json(orders);
   } catch (error) {
     next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error))

@@ -26,9 +26,11 @@ const getOrdersByUserId = async (req) => {
 }
 
 // Fetch orders by seller ID for sellers
-const getOrdersBySellerId = async (sellerId) => {
+const getOrdersBySellerId = async (req) => {
   try {
-    return await orderModel.getOrdersBySellerId(sellerId);
+    const sellerId = req.user.userId
+    const { status, startDate, endDate } = req.query
+    return await orderModel.getOrdersBySellerId(sellerId, status, startDate, endDate);
   } catch (error) {
     throw new Error('Error fetching orders for seller: ' + error.message);
   }
