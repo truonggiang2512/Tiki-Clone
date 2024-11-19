@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import { ObjectId } from "mongodb";
 import { orderModel } from "~/models/orderModel";
 import ApiError from "~/utils/ApiError";
+import { orderValidation } from "~/validations/orderValidation";
 
 const calculateProductData = (items) => {
   let grandTotal = 0;
@@ -39,17 +40,15 @@ const getOrderById = async (orderId) => {
 }
 
 // Update order status by order ID
-const updateOrderStatus = async (orderId, status) => {
+const updateOrderStatus = async (req) => {
+  const { orderId } = req.params
+  const { status } = req.body
   try {
-    const db = GET_DB();
-    const updatedOrder = await db.collection(ORDER_COLLECTION_NAME).findOneAndUpdate(
-      { _id: new ObjectId(orderId) },
-      { $set: { status } },
-      { returnDocument: 'after' }
-    );
-    return updatedOrder.value;
+    if (!orderId || !status) throw new ApiError(StatusCodes.BAD_REQUEST, "orderId Invalid")
+    await orderValidation.updateStatusOrder.validateAsync({ status })
+    return await orderModel.updateOrderStatus(orderId, status)
   } catch (error) {
-    throw new Error('Error updating order status: ' + error.message);
+    throw error
   }
 }
 

@@ -46,12 +46,12 @@ const getOrdersBySeller = async (req, res, next) => {
 }
 
 
-const updateOrderStatus = async (req, res) => {
+const updateOrderStatus = async (req, res, next) => {
   try {
-    const updatedOrder = await orderService.updateOrderStatus(req.params.id, req.body.status);
+    const updatedOrder = await orderService.updateOrderStatus(req);
     res.status(StatusCodes.OK).json(updatedOrder);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error updating order status' });
+    next(error)
   }
 }
 

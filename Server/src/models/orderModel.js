@@ -25,6 +25,7 @@ const ORDER_COLLECTION_SCHEMA = Joi.object({
     .valid("processing", "shipped", "canceled", "delivered")
     .required(),
 });
+
 const createOrder = async (order) => {
   try {
     return GET_DB().collection(ORDER_COLLECTION_NAME).insertOne(order)
@@ -61,15 +62,16 @@ const getOrdersBySellerId = async (sellerId) => {
         $unwind: "$items" // Break down each order's items array
       },
       {
-        $addFields: {
-          "items.productId": { $toObjectId: "$items.productId" }
-        }
-      },
-      {
         $lookup: {
           from: "products", // Join with the products collection
-          localField: "items.productId", // Match items.productId in orders
-          foreignField: "_id", // With _id in products
+          let: { productId: "$items.productId" }, // Define a variable
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", { $toObjectId: "$$productId" }] }
+              }
+            }
+          ],
           as: "productDetails"
         }
       },
@@ -94,10 +96,23 @@ const getOrdersBySellerId = async (sellerId) => {
       {
         $sort: { orderDate: -1 } // Sort by newest orders first
       }
-    ]).toArray();
+    ])
+      .toArray();
     return orders;
   } catch (error) {
     throw new Error('Error fetching orders for seller: ' + error.message);
+  }
+}
+const updateOrderStatus = async (orderId, status) => {
+  try {
+    return GET_DB().collection(ORDER_COLLECTION_NAME).updateOne(
+      {
+        _id: ObjectId.createFromHexString(orderId),
+      },
+      { $set: { status } },
+    )
+  } catch (error) {
+    throw new Error(error)
   }
 }
 export const orderModel = {
@@ -107,5 +122,6 @@ export const orderModel = {
   getOrdersByUserId,
   getOrderById,
   deleteOrder,
-  getOrdersBySellerId
+  getOrdersBySellerId,
+  updateOrderStatus
 }
