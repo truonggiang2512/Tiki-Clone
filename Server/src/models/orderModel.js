@@ -1,5 +1,5 @@
 import Joi from "joi"
-import { ObjectId } from "mongodb"
+import { Db, ObjectId } from "mongodb"
 import { GET_DB } from "~/config/mongodb"
 import { OBJECT_ID_RULE } from "./validator";
 
@@ -22,9 +22,10 @@ const ORDER_COLLECTION_SCHEMA = Joi.object({
   orderDate: Joi.date().required(),
 
   status: Joi.string()
-    .valid("processing", "shipped", "canceled", "delivered")
+    .valid("processing", "shipped", "canceled", "delivered", "completed")
     .required(),
 });
+
 const createOrder = async (order) => {
   try {
     return GET_DB().collection(ORDER_COLLECTION_NAME).insertOne(order)
@@ -47,29 +48,44 @@ const getOrderById = async (orderId) => {
     throw new Error(error)
   }
 }
-const deleteOrder = async (orderId) => {
+const cancelOrder = async (orderId) => {
   try {
-    return await GET_DB().collection(ORDER_COLLECTION_NAME).findOneAndDelete({ _id: ObjectId.createFromHexString(orderId) })
+    return await GET_DB().collection(ORDER_COLLECTION_NAME).updateOne({ _id: ObjectId.createFromHexString(orderId) }, { $set: { status: "cancelled" } })
   } catch (error) {
     throw new Error(error)
   }
 }
-const getOrdersBySellerId = async (sellerId) => {
+const getOrdersBySellerId = async (sellerId, status = null, startDate = null, endDate = null) => {
   try {
+    const matchConditions = {
+      "productDetails.sellerId": sellerId // Match sellerId
+    };
+
+    if (status) {
+      matchConditions.status = status; // Filter by status if provided
+    }
+
+    if (startDate && endDate) {
+      matchConditions.orderDate = {
+        $gte: new Date(startDate), // Filter by start date
+        $lte: new Date(endDate) // Filter by end date
+      };
+    }
     const orders = await GET_DB().collection(ORDER_COLLECTION_NAME).aggregate([
       {
         $unwind: "$items" // Break down each order's items array
       },
       {
-        $addFields: {
-          "items.productId": { $toObjectId: "$items.productId" }
-        }
-      },
-      {
         $lookup: {
           from: "products", // Join with the products collection
-          localField: "items.productId", // Match items.productId in orders
-          foreignField: "_id", // With _id in products
+          let: { productId: "$items.productId" }, // Define a variable
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", { $toObjectId: "$$productId" }] }
+              }
+            }
+          ],
           as: "productDetails"
         }
       },
@@ -77,9 +93,7 @@ const getOrdersBySellerId = async (sellerId) => {
         $unwind: "$productDetails" // Flatten productDetails
       },
       {
-        $match: {
-          "productDetails.sellerId": sellerId // Match sellerId
-        }
+        $match: matchConditions
       },
       {
         $group: {
@@ -94,10 +108,40 @@ const getOrdersBySellerId = async (sellerId) => {
       {
         $sort: { orderDate: -1 } // Sort by newest orders first
       }
-    ]).toArray();
+    ])
+      .toArray();
     return orders;
   } catch (error) {
     throw new Error('Error fetching orders for seller: ' + error.message);
+  }
+}
+const updateOrderStatus = async (orderId, status) => {
+  try {
+    return GET_DB().collection(ORDER_COLLECTION_NAME).updateOne(
+      {
+        _id: ObjectId.createFromHexString(orderId),
+      },
+      { $set: { status } },
+    )
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+const filterOrderByQuery = async ({ status, startDate, endDate }) => {
+  try {
+    const filterQuery = {};
+    if (status) {
+      filterQuery.status = status;
+    }
+    if (startDate && endDate) {
+      filterQuery.orderDate = {
+        $gte: new Date(startDate), // Ensure proper date format
+        $lte: new Date(endDate),
+      };
+    }
+    return GET_DB().collection(ORDER_COLLECTION_NAME).find(filterQuery).toArray()
+  } catch (error) {
+    throw new Error(error)
   }
 }
 export const orderModel = {
@@ -106,6 +150,8 @@ export const orderModel = {
   createOrder,
   getOrdersByUserId,
   getOrderById,
-  deleteOrder,
-  getOrdersBySellerId
+  cancelOrder,
+  getOrdersBySellerId,
+  updateOrderStatus,
+  filterOrderByQuery,
 }

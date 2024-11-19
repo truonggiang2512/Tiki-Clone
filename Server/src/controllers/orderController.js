@@ -12,7 +12,7 @@ const createNew = async (req, res, next) => {
 }
 const getOrdersByUser = async (req, res, next) => {
   try {
-    const orders = await orderService.getOrdersByUserId(req.user.userId);
+    const orders = await orderService.getOrdersByUserId(req);
     res.status(StatusCodes.OK).json(orders);
   } catch (error) {
     next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error))
@@ -37,7 +37,7 @@ const cancelOrder = async (req, res, next) => {
 // Fetch orders by seller ID for sellers
 const getOrdersBySeller = async (req, res, next) => {
   try {
-    const orders = await orderService.getOrdersBySellerId(req.user.userId);
+    const orders = await orderService.getOrdersBySellerId(req);
     res.status(StatusCodes.OK).json(orders);
   } catch (error) {
     next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error))
@@ -46,20 +46,29 @@ const getOrdersBySeller = async (req, res, next) => {
 }
 
 
-const updateOrderStatus = async (req, res) => {
+const updateOrderStatus = async (req, res, next) => {
   try {
-    const updatedOrder = await orderService.updateOrderStatus(req.params.id, req.body.status);
+    const updatedOrder = await orderService.updateOrderStatus(req);
     res.status(StatusCodes.OK).json(updatedOrder);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error updating order status' });
+    next(error)
   }
 }
 
+const reorderOrder = async (req, res, next) => {
+  try {
+    await orderService.reorderOrder(req)
+    res.status(StatusCodes.OK).json("Order successfully");
+  } catch (error) {
+    next(error)
+  }
+}
 export const orderController = {
   getOrdersByUser,
   getOrdersBySeller,
   getOrderById,
   updateOrderStatus,
   createNew,
-  cancelOrder
+  cancelOrder,
+  reorderOrder
 }

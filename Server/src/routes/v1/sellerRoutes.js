@@ -14,4 +14,6 @@ Router.route('/products/:id')
   .put(authenticateJWT, authorizeSeller, productValidation.updateProduct, productController.editOneById)
 Router.route('/orders')
   .get(authenticateJWT, authorizeSeller, orderController.getOrdersBySeller)
+Router.route('/orders/:orderId')
+  .put(authenticateJWT, authorizeSeller, orderController.updateOrderStatus)
 export const sellerRoutes = Router
