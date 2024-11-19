@@ -13,8 +13,12 @@ const calculateProductData = (items) => {
 
   return { grandTotal };
 };
-const getOrdersByUserId = async (userId) => {
+const getOrdersByUserId = async (req) => {
+  const { userId } = req.user
+  const { status, startDate, endDate } = req.query;
+  console.log(status, startDate, endDate)
   try {
+    if (startDate || endDate || status) return await orderModel.filterOrderByQuery({ startDate, endDate, status })
     return await orderModel.getOrdersByUserId(userId)
   } catch (error) {
     throw error

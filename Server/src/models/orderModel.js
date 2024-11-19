@@ -115,6 +115,23 @@ const updateOrderStatus = async (orderId, status) => {
     throw new Error(error)
   }
 }
+const filterOrderByQuery = async ({ status, startDate, endDate }) => {
+  try {
+    const filterQuery = {};
+    if (status) {
+      filterQuery.status = status;
+    }
+    if (startDate && endDate) {
+      filterQuery.orderDate = {
+        $gte: new Date(startDate), // Ensure proper date format
+        $lte: new Date(endDate),
+      };
+    }
+    return GET_DB().collection(ORDER_COLLECTION_NAME).find(filterQuery).toArray()
+  } catch (error) {
+
+  }
+}
 export const orderModel = {
   ORDER_COLLECTION_SCHEMA,
   ORDER_COLLECTION_NAME,
@@ -123,5 +140,6 @@ export const orderModel = {
   getOrderById,
   deleteOrder,
   getOrdersBySellerId,
-  updateOrderStatus
+  updateOrderStatus,
+  filterOrderByQuery
 }

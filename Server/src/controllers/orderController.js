@@ -12,7 +12,7 @@ const createNew = async (req, res, next) => {
 }
 const getOrdersByUser = async (req, res, next) => {
   try {
-    const orders = await orderService.getOrdersByUserId(req.user.userId);
+    const orders = await orderService.getOrdersByUserId(req);
     res.status(StatusCodes.OK).json(orders);
   } catch (error) {
     next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error))
