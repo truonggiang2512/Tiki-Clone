@@ -11,8 +11,9 @@ Router.route('/')
   .post(authenticateJWT, orderValidation.createNew, orderController.createNew) // create an order 
 Router.route('/:orderId')
   .get(authenticateJWT, orderController.getOrderById)
-  .put(authenticateJWT, orderController.updateOrderStatus)
   .delete(authenticateJWT, orderController.cancelOrder)
+Router.route('/:orderId/reorder')
+  .post(authenticateJWT, orderController.reorderOrder);
 
 
 export const orderRoutes = Router

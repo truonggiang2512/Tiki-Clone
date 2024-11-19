@@ -42,7 +42,7 @@ const createNew = async (req, res, next) => {
 }
 const updateStatusOrder = Joi.object({
   status: Joi.string()
-    .valid("processing", "shipped", "canceled", "delivered")
+    .valid("processing", "shipped", "canceled", "delivered", "completed")
     .required(),
 })
 

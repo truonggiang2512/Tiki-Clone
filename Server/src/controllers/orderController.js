@@ -55,11 +55,20 @@ const updateOrderStatus = async (req, res, next) => {
   }
 }
 
+const reorderOrder = async (req, res, next) => {
+  try {
+    await orderService.reorderOrder(req)
+    res.status(StatusCodes.OK).json("Order successfully");
+  } catch (error) {
+    next(error)
+  }
+}
 export const orderController = {
   getOrdersByUser,
   getOrdersBySeller,
   getOrderById,
   updateOrderStatus,
   createNew,
-  cancelOrder
+  cancelOrder,
+  reorderOrder
 }

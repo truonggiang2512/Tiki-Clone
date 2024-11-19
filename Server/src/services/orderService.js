@@ -16,7 +16,6 @@ const calculateProductData = (items) => {
 const getOrdersByUserId = async (req) => {
   const { userId } = req.user
   const { status, startDate, endDate } = req.query;
-  console.log(status, startDate, endDate)
   try {
     if (startDate || endDate || status) return await orderModel.filterOrderByQuery({ startDate, endDate, status })
     return await orderModel.getOrdersByUserId(userId)
@@ -50,7 +49,7 @@ const updateOrderStatus = async (req) => {
   const { orderId } = req.params
   const { status } = req.body
   try {
-    if (!orderId || !status) throw new ApiError(StatusCodes.BAD_REQUEST, "orderId Invalid")
+    if (!orderId || !status) throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid agrument")
     await orderValidation.updateStatusOrder.validateAsync({ status })
     return await orderModel.updateOrderStatus(orderId, status)
   } catch (error) {
@@ -65,7 +64,7 @@ const createOrder = async (req) => {
   try {
     const reqData = {
       ...req.body,
-      userId: ObjectId(userId),
+      userId: userId,
       totalPrice: grandTotal,
       orderDate: new Date().getTime(),
       status: "processing"
@@ -81,10 +80,47 @@ const createOrder = async (req) => {
 const cancelOrder = async (orderId) => {
   try {
     const order = await orderModel.getOrderById(orderId)
-    if (!order) throw new ApiError(StatusCodes.NOT_FOUND, "order not found")
+    if (!order) throw new ApiError(StatusCodes.NOT_FOUND, "Order not found")
     const { status } = order
     if (status !== "processing") throw new ApiError(StatusCodes.BAD_REQUEST, "Only orders with status 'processing' can be deleted.")
     return await orderModel.deleteOrder(orderId)
+  } catch (error) {
+    throw error
+  }
+}
+const reorderOrder = async (req) => {
+  try {
+    const { orderId } = req.params
+    const { userId } = req.user
+    if (!orderId) throw new ApiError(StatusCodes.NOT_FOUND, "Order not found")
+
+    // GET order
+    const order = await orderModel.getOrderById(orderId)
+
+
+    if (order.userId != userId) throw new ApiError(StatusCodes.UNAUTHORIZED, "You dont have permission")
+    const { items, _id, res } = order
+    // Calculate the payment grandToal
+    const { grandTotal } = calculateProductData(items);
+
+
+    // Allow reorder only for specific statuses
+    const allowedStatuses = ["canceled", "delivered", "completed"];
+    if (!allowedStatuses.includes(order.status)) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        `You can only reorder completed, delivered or canceled orders. Current status: ${order.status}`
+      );
+    }
+
+    const newOrder = {
+      ...res,
+      userId: userId,
+      totalPrice: grandTotal,
+      orderDate: new Date().getTime(),
+      status: "processing"
+    }
+    return await orderModel.createOrder(newOrder)
   } catch (error) {
     throw error
   }
@@ -97,5 +133,6 @@ export const orderService = {
   getOrdersByUserId,
   updateOrderStatus,
   createOrder,
-  cancelOrder
+  cancelOrder,
+  reorderOrder
 }

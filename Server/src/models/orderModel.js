@@ -1,5 +1,5 @@
 import Joi from "joi"
-import { ObjectId } from "mongodb"
+import { Db, ObjectId } from "mongodb"
 import { GET_DB } from "~/config/mongodb"
 import { OBJECT_ID_RULE } from "./validator";
 
@@ -22,7 +22,7 @@ const ORDER_COLLECTION_SCHEMA = Joi.object({
   orderDate: Joi.date().required(),
 
   status: Joi.string()
-    .valid("processing", "shipped", "canceled", "delivered")
+    .valid("processing", "shipped", "canceled", "delivered", "completed")
     .required(),
 });
 
@@ -141,10 +141,9 @@ const filterOrderByQuery = async ({ status, startDate, endDate }) => {
     }
     return GET_DB().collection(ORDER_COLLECTION_NAME).find(filterQuery).toArray()
   } catch (error) {
-
+    throw new Error(error)
   }
 }
-
 export const orderModel = {
   ORDER_COLLECTION_SCHEMA,
   ORDER_COLLECTION_NAME,
@@ -154,5 +153,5 @@ export const orderModel = {
   deleteOrder,
   getOrdersBySellerId,
   updateOrderStatus,
-  filterOrderByQuery
+  filterOrderByQuery,
 }
