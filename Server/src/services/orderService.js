@@ -83,7 +83,7 @@ const cancelOrder = async (orderId) => {
     if (!order) throw new ApiError(StatusCodes.NOT_FOUND, "Order not found")
     const { status } = order
     if (status !== "processing") throw new ApiError(StatusCodes.BAD_REQUEST, "Only orders with status 'processing' can be deleted.")
-    return await orderModel.deleteOrder(orderId)
+    return await orderModel.cancelOrder(orderId)
   } catch (error) {
     throw error
   }

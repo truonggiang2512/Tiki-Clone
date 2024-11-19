@@ -48,9 +48,9 @@ const getOrderById = async (orderId) => {
     throw new Error(error)
   }
 }
-const deleteOrder = async (orderId) => {
+const cancelOrder = async (orderId) => {
   try {
-    return await GET_DB().collection(ORDER_COLLECTION_NAME).findOneAndDelete({ _id: ObjectId.createFromHexString(orderId) })
+    return await GET_DB().collection(ORDER_COLLECTION_NAME).updateOne({ _id: ObjectId.createFromHexString(orderId) }, { $set: { status: "cancelled" } })
   } catch (error) {
     throw new Error(error)
   }
@@ -150,7 +150,7 @@ export const orderModel = {
   createOrder,
   getOrdersByUserId,
   getOrderById,
-  deleteOrder,
+  cancelOrder,
   getOrdersBySellerId,
   updateOrderStatus,
   filterOrderByQuery,
