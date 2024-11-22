@@ -1,4 +1,5 @@
 import Joi from "joi"
+import { ObjectId } from "mongodb";
 import { GET_DB } from "~/config/mongodb";
 
 const REVIEW_COLLECTION_NAME = "reviews"
@@ -32,8 +33,36 @@ const insertOneReview = async (data) => {
   }
 }
 
+
+const updateOrCreateReview = async (data, userId) => {
+  try {
+    const { reviewId, rating, comment } = data
+    if (!ObjectId.isValid(reviewId)) {
+      throw new Error("Invalid reviewId format.");
+    }
+    const query = {
+      _id: ObjectId.createFromHexString(reviewId),
+      userId: userId.toString(),
+    };
+    return await GET_DB()
+      .collection(REVIEW_COLLECTION_NAME)
+      .findOneAndUpdate(
+        query, // Check if a review exists for this review by this user
+        {
+          $set: { rating, comment, updatedAt: new Date().getTime() }, // Update fields
+        },
+        {
+          returnDocument: "after", // Return the updated or inserted document
+        }
+      );
+  } catch (error) {
+    throw new Error("Error updating or creating review: " + error.message);
+  }
+};
+
 export const reviewModel = {
   REVIEW_COLLECTION_NAME,
   REVIEW_COLLECTION_SCHEMA,
-  insertOneReview
+  insertOneReview,
+  updateOrCreateReview
 }

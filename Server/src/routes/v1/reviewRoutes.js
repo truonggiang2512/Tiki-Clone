@@ -7,5 +7,6 @@ const Router = express.Router();
 
 Router.route('/')
   .post(authenticateJWT, reviewValidation.createNew, reviewController.createNewReview) // Create new review
-
+Router.route('/:reviewId')
+  .put(authenticateJWT, reviewValidation.updateReview, reviewController.updateReview)
 export const reviewRoutes = Router
