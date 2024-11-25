@@ -14,6 +14,9 @@ const REVIEW_COLLECTION_SCHEMA = Joi.object({
     .required()
     .min(1)
     .max(5), // Valid range for ratings
+  sellerId: Joi.string()
+    .required()
+    .pattern(/^[0-9a-fA-F]{24}$/),
   comment: Joi.string()
     .allow("") // Optional, allow empty string
     .max(500), // Comment character limit
@@ -75,10 +78,81 @@ const deleteReview = async (reviewId, userId) => {
     throw new Error("Error deleting review: " + error.message);
   }
 }
+const getReviewsForProduct = async (productId) => {
+  try {
+    return await GET_DB()
+      .collection(REVIEW_COLLECTION_NAME)
+      .aggregate([
+        {
+          $match: {
+            productId: productId // Filter reviews for the given productId
+          }
+        },
+        {
+          $lookup: {
+            from: "products", // Join with the products collection
+            let: { productId: "$productId" }, // Use productId from the reviews collection
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: ["$_id", { $toObjectId: "$$productId" }] // Compare product _id with converted productId
+                  }
+                }
+              },
+              {
+                $project: {
+                  name: 1,
+                  category: 1,
+                  price: 1
+                }
+              }
+            ],
+            as: "productDetails" // Add matched product details here
+          }
+        },
+        {
+          $unwind: "$productDetails" // Flatten product details if necessary
+        },
+        {
+          $project: {
+            _id: 1,
+            rating: 1,
+            comment: 1,
+            userId: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            productDetails: 1 // Include product details in the result
+          }
+        }
+      ])
+      .toArray();
+
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+const getReviewsForSeller = async (sellerId) => {
+  try {
+    console.log(sellerId)
+    const query = {
+      sellerId
+    }
+    return await GET_DB()
+      .collection(REVIEW_COLLECTION_NAME)
+      .find(query)
+      .toArray()
+  } catch (error) {
+    throw new Error(error)
+  }
+
+}
 export const reviewModel = {
   REVIEW_COLLECTION_NAME,
   REVIEW_COLLECTION_SCHEMA,
   insertOneReview,
   updateReview,
-  deleteReview
+  deleteReview,
+  getReviewsForSeller,
+  getReviewsForProduct
 }

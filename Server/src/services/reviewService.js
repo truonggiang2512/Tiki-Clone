@@ -8,14 +8,17 @@ const createNewReview = async (req) => {
     const { userId } = req.user
     const { productId } = req.body
     if (!userId) throw new ApiError(StatusCodes.FORBIDDEN, 'Permission denied to create this review ')
-    const isProductValid = productModel.findOneById(productId)
-    if (isProductValid) {
+    const product = await productModel.findOneById(productId)
+    if (product) {
+      const sellerId = product.sellerId;
       const newReview = {
         ...req.body,
+        sellerId: sellerId,
         createdAt: new Date().getTime(),
         updatedAt: null,
         userId,
       }
+
       return await reviewModel.insertOneReview(newReview)
     }
     else {
@@ -52,11 +55,26 @@ const deleteReview = async (req) => {
     const review = await reviewModel.deleteReview(reviewId, userId)
     return review
   } catch (error) {
-
+    throw error
+  }
+}
+const getReviews = async (req) => {
+  try {
+    const { type, id } = req.params
+    if (!type && !id) throw new ApiError(StatusCodes.BAD_REQUEST, 'Missing agrument')
+    if (type === "product") {
+      return await reviewModel.getReviewsForProduct(id);
+    }
+    if (type === "seller") {
+      return await reviewModel.getReviewsForSeller(id);
+    }
+  } catch (error) {
+    throw error
   }
 }
 export const reviewService = {
   createNewReview,
   updateReview,
-  deleteReview
+  deleteReview,
+  getReviews
 }
