@@ -134,7 +134,6 @@ const getReviewsForProduct = async (productId) => {
 }
 const getReviewsForSeller = async (sellerId) => {
   try {
-    console.log(sellerId)
     const query = {
       sellerId
     }
@@ -145,8 +144,57 @@ const getReviewsForSeller = async (sellerId) => {
   } catch (error) {
     throw new Error(error)
   }
-
 }
+const topRatingProduct = async () => {
+  try {
+    const data = await GET_DB()
+      .collection(REVIEW_COLLECTION_NAME)
+      .aggregate([
+        { $group: { _id: "$productId", avgRating: { $avg: "$rating" } } },
+        { $sort: { avgRating: -1 } },
+        { $limit: 10 },
+        {
+          $lookup: {
+            from: "products",
+            let: { productId: "$_id" }, // Using _id from reviews as productId
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    // Convert productId to ObjectId if it's not already
+                    $eq: [{ $toObjectId: "$$productId" }, "$_id"]
+                  }
+                }
+              },
+              {
+                $project: {
+                  name: 1,
+                  category: 1,
+                  price: 1
+                }
+              }
+            ],
+            as: "productDetails"
+          }
+        },
+        { $unwind: { path: "$productDetails", preserveNullAndEmptyArrays: true } },
+        {
+          $project: {
+            productId: "$_id",
+            avgRating: 1,
+            productName: "$productDetails.name",
+            price: "$productDetails.price",
+            category: "$productDetails.category"
+          }
+        }
+      ]).toArray();
+
+    return data; // Ensure to return the data
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const reviewModel = {
   REVIEW_COLLECTION_NAME,
   REVIEW_COLLECTION_SCHEMA,
@@ -154,5 +202,6 @@ export const reviewModel = {
   updateReview,
   deleteReview,
   getReviewsForSeller,
-  getReviewsForProduct
+  getReviewsForProduct,
+  topRatingProduct
 }

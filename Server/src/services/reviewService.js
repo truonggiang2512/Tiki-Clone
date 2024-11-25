@@ -72,9 +72,21 @@ const getReviews = async (req) => {
     throw error
   }
 }
+const topRatingProduct = async () => {
+  try {
+    const product = await reviewModel.topRatingProduct()
+    if (!product || product.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, "No top-rated products found.")
+    }
+    return product
+  } catch (error) {
+    throw error
+  }
+}
 export const reviewService = {
   createNewReview,
   updateReview,
   deleteReview,
-  getReviews
+  getReviews,
+  topRatingProduct
 }

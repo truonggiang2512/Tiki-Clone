@@ -34,9 +34,18 @@ const getReviews = async (req, res, next) => {
     next(error)
   }
 }
+const topRatingProduct = async (req, res, next) => {
+  try {
+    const product = await reviewService.topRatingProduct()
+    res.status(StatusCodes.OK).json(product)
+  } catch (error) {
+    next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.message))
+  }
+}
 export const reviewController = {
   createNewReview,
   updateReview,
   deleteReview,
-  getReviews
+  getReviews,
+  topRatingProduct
 }
