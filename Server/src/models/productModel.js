@@ -71,7 +71,7 @@ const editOneById = async (data, productId) => {
 const findOneById = async (id) => {
   try {
     const result = await GET_DB().collection(PRODUCT_COLLECTION_NAME).findOne({
-      _id: id
+      _id: ObjectId.createFromHexString(id)
     })
     return result
   } catch (error) {
