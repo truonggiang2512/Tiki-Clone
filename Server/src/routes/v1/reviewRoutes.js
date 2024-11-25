@@ -9,4 +9,5 @@ Router.route('/')
   .post(authenticateJWT, reviewValidation.createNew, reviewController.createNewReview) // Create new review
 Router.route('/:reviewId')
   .put(authenticateJWT, reviewValidation.updateReview, reviewController.updateReview)
+  .delete(authenticateJWT, reviewController.deleteReview)
 export const reviewRoutes = Router

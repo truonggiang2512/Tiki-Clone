@@ -34,7 +34,7 @@ const insertOneReview = async (data) => {
 }
 
 
-const updateOrCreateReview = async (data, userId) => {
+const updateReview = async (data, userId) => {
   try {
     const { reviewId, rating, comment } = data
     if (!ObjectId.isValid(reviewId)) {
@@ -56,13 +56,29 @@ const updateOrCreateReview = async (data, userId) => {
         }
       );
   } catch (error) {
-    throw new Error("Error updating or creating review: " + error.message);
+    throw new Error("Error updating review: " + error.message);
   }
 };
 
+const deleteReview = async (reviewId, userId) => {
+  try {
+    const query = {
+      _id: ObjectId.createFromHexString(reviewId),
+      userId: userId.toString(),
+    }
+    return await GET_DB()
+      .collection(REVIEW_COLLECTION_NAME)
+      .findOneAndDelete(
+        query,
+      )
+  } catch (error) {
+    throw new Error("Error deleting review: " + error.message);
+  }
+}
 export const reviewModel = {
   REVIEW_COLLECTION_NAME,
   REVIEW_COLLECTION_SCHEMA,
   insertOneReview,
-  updateOrCreateReview
+  updateReview,
+  deleteReview
 }

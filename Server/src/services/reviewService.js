@@ -34,7 +34,7 @@ const updateReview = async (req) => {
       ...req.body
     }
     if (!userId) throw new ApiError(StatusCodes.FORBIDDEN, 'Permission denied to create this review ')
-    const review = await reviewModel.updateOrCreateReview(data, userId)
+    const review = await reviewModel.updateReview(data, userId)
     if (!review) {
       // If no document was found, throw an error
       throw new ApiError(StatusCodes.NOT_FOUND, "Review not found. Cannot update a non-existent review.");
@@ -44,8 +44,19 @@ const updateReview = async (req) => {
     throw error
   }
 }
+const deleteReview = async (req) => {
+  try {
+    const { userId } = req.user;
+    const { reviewId } = req.params;
+    if (!userId) throw new ApiError(StatusCodes.FORBIDDEN, 'Permission denied to create this review ')
+    const review = await reviewModel.deleteReview(reviewId, userId)
+    return review
+  } catch (error) {
 
+  }
+}
 export const reviewService = {
   createNewReview,
-  updateReview
+  updateReview,
+  deleteReview
 }
