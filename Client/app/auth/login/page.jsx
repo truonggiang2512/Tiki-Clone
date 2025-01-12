@@ -19,7 +19,7 @@ export default function LoginPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+    <form onSubmit={handleSubmit} className="mt-8 space-y-6 ">
       <div className="space-y-4">
         <div>
           <Label htmlFor="email">Email address</Label>
