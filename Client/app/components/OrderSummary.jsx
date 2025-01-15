@@ -4,7 +4,11 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { CartItem } from "./CartItems";
 
-export default function OrderSummary({ items, selectedItems }) {
+export default function OrderSummary({
+  items,
+  selectedItems,
+  voucherDiscount,
+}) {
   const [subtotal, setSubtotal] = useState(0);
   const [shipping] = useState(5.0);
   const [tax, setTax] = useState(0);
@@ -21,7 +25,8 @@ export default function OrderSummary({ items, selectedItems }) {
     setTax(newSubtotal * 0.08); // Assuming 8% tax rate
   }, [items, selectedItems]);
 
-  const total = subtotal + shipping + tax;
+  const discountAmount = (subtotal * voucherDiscount) / 100;
+  const total = subtotal + shipping + tax - discountAmount;
 
   return (
     <div className="mt-6 space-y-4">
@@ -31,6 +36,12 @@ export default function OrderSummary({ items, selectedItems }) {
           ${subtotal.toFixed(2)}
         </p>
       </div>
+      {voucherDiscount > 0 && (
+        <div className="flex items-center justify-between text-green-600">
+          <p className="text-sm">Voucher Discount</p>
+          <p className="text-sm font-medium">-${discountAmount.toFixed(2)}</p>
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-600">Shipping</p>
         <p className="text-sm font-medium text-gray-900">
@@ -47,11 +58,8 @@ export default function OrderSummary({ items, selectedItems }) {
           ${total.toFixed(2)}
         </p>
       </div>
-      <Button
-        className="w-full mt-6 bg-gray-800 hover:bg-gray-700 text-white"
-        disabled={selectedItems.length === 0}
-      >
-        Proceed to Checkout
+      <Button className="w-full mt-6 bg-gray-800 hover:bg-gray-700 text-white">
+        Place Order
       </Button>
     </div>
   );
