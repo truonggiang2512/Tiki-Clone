@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 const products = [
   {
@@ -72,27 +73,30 @@ export default function DailyDiscoveries() {
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {products.map((product) => (
-            <div
+            <Link
+              href={`/product/${product.id}`}
               key={product.id}
-              className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200"
+              className="group"
             >
-              <div className="relative h-48">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                />
+              <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200">
+                <div className="relative h-48">
+                  <Image
+                    src={product.image || "/placeholder.svg"}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="text-sm font-medium text-gray-800 truncate">
+                    {product.name}
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-800 font-bold">
+                    ${product.price.toFixed(2)}
+                  </p>
+                </div>
               </div>
-              <div className="p-4">
-                <h3 className="text-sm font-medium text-gray-800 truncate">
-                  {product.name}
-                </h3>
-                <p className="mt-1 text-sm text-gray-800 font-bold">
-                  ${product.price.toFixed(2)}
-                </p>
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

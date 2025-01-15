@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
+import { Product } from "../utils/types";
 
 const topPicks = [
   {
@@ -59,7 +61,7 @@ export default function TopPicksSection() {
             <div key={product.id} className="group relative">
               <div className="aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75">
                 <Image
-                  src={product.image}
+                  src={product.image || "/placeholder.svg"}
                   alt={product.name}
                   width={200}
                   height={200}
@@ -69,10 +71,10 @@ export default function TopPicksSection() {
               <div className="mt-4 flex justify-between">
                 <div>
                   <h3 className="text-sm text-gray-700">
-                    <a href={`/product/${product.id}`}>
+                    <Link href={`/product/${product.id}`}>
                       <span aria-hidden="true" className="absolute inset-0" />
                       {product.name}
-                    </a>
+                    </Link>
                   </h3>
                   <p className="mt-1 text-sm text-gray-500">{product.brand}</p>
                 </div>

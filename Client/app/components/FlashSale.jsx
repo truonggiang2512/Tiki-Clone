@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -107,35 +108,37 @@ export default function FlashSale() {
         >
           {flashSaleProducts.map((product) => (
             <SwiperSlide key={product.id}>
-              <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200">
-                <div className="relative h-48">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute top-0 right-0 bg-gray-800 text-white px-2 py-1 text-xs font-bold">
-                    {Math.round(
-                      (1 - product.price / product.originalPrice) * 100
-                    )}
-                    % OFF
+              <Link href={`/product/${product.id}`} className="block">
+                <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200">
+                  <div className="relative h-48">
+                    <Image
+                      src={product.image || "/placeholder.svg"}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute top-0 right-0 bg-gray-800 text-white px-2 py-1 text-xs font-bold">
+                      {Math.round(
+                        (1 - product.price / product.originalPrice) * 100
+                      )}
+                      % OFF
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-sm font-medium text-gray-800 truncate">
+                      {product.name}
+                    </h3>
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className="text-gray-800 font-bold">
+                        ${product.price.toFixed(2)}
+                      </span>
+                      <span className="text-xs text-gray-500 line-through">
+                        ${product.originalPrice.toFixed(2)}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="text-sm font-medium text-gray-800 truncate">
-                    {product.name}
-                  </h3>
-                  <div className="mt-2 flex items-center justify-between">
-                    <span className="text-gray-800 font-bold">
-                      ${product.price.toFixed(2)}
-                    </span>
-                    <span className="text-xs text-gray-500 line-through">
-                      ${product.originalPrice.toFixed(2)}
-                    </span>
-                  </div>
-                </div>
-              </div>
+              </Link>
             </SwiperSlide>
           ))}
           <div className="swiper-button-prev absolute left-0 top-1/2 transform -translate-y-1/2 z-10">
