@@ -12,10 +12,19 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   return (
     <header className="bg-white text-gray-800 shadow-md">
@@ -53,10 +62,10 @@ export default function Header() {
               <QuestionCircle className="w-4 h-4 mr-1" />
               Help
             </Link>
-            <Link href="/auth/signup" className="hover:text-gray-600">
+            <Link href="/signup" className="hover:text-gray-600">
               Sign Up
             </Link>
-            <Link href="/auth/login" className="hover:text-gray-600">
+            <Link href="/login" className="hover:text-gray-600">
               Login
             </Link>
           </nav>
@@ -67,7 +76,7 @@ export default function Header() {
           <Link href="/" className="text-2xl font-bold text-gray-800">
             DokeShop
           </Link>
-          <div className="flex-1 max-w-xl mx-4">
+          <form onSubmit={handleSearch} className="flex-1 max-w-xl mx-4">
             <div className="relative">
               <Input
                 type="text"
@@ -83,7 +92,7 @@ export default function Header() {
                 <Search className="w-5 h-5" />
               </Button>
             </div>
-          </div>
+          </form>
           <Link href="/cart" className="text-2xl text-gray-800">
             <ShoppingCart className="w-6 h-6" />
           </Link>
