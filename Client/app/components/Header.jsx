@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -13,18 +13,30 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import UserDropdown from "./UserDropdown";
 
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
   const router = useRouter();
-
+  const [token, setToken] = useState(null);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setToken(localStorage.getItem("token"));
+    }
+  }, []);
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
+  const user = {
+    name: "John Doe",
+    email: "john@example.com",
+    avatar: "/placeholder.svg?height=32&width=32",
+  };
+  console.log(token);
 
   return (
     <header className="bg-white text-gray-800 shadow-md">
@@ -62,12 +74,18 @@ export default function Header() {
               <QuestionCircle className="w-4 h-4 mr-1" />
               Help
             </Link>
-            <Link href="/signup" className="hover:text-gray-600">
-              Sign Up
-            </Link>
-            <Link href="/login" className="hover:text-gray-600">
-              Login
-            </Link>
+            {!token ? (
+              <>
+                <Link href="/auth/signup" className="hover:text-gray-600">
+                  Sign Up
+                </Link>
+                <Link href="/auth/login" className="hover:text-gray-600">
+                  Login
+                </Link>
+              </>
+            ) : (
+              <></>
+            )}
           </nav>
         </div>
       </div>
@@ -93,9 +111,16 @@ export default function Header() {
               </Button>
             </div>
           </form>
-          <Link href="/cart" className="text-2xl text-gray-800">
-            <ShoppingCart className="w-6 h-6" />
-          </Link>
+          {token ? (
+            <div className="flex items-center space-x-4">
+              <Link href="/cart" className="text-2xl text-gray-800">
+                <ShoppingCart className="w-6 h-6" />
+              </Link>
+              <UserDropdown user={user} />
+            </div>
+          ) : (
+            <> </>
+          )}
         </div>
       </div>
     </header>
