@@ -53,20 +53,17 @@ const signIn = async (reqBody) => {
 }
 const updateUserById = async (req) => {
   try {
-    const userId = req.params.userId;
-    const userIdToken = req.user.userId;
-    await userHelper.authorizeUser(userIdToken, userId)
+    const userId = req.user.userId;
+    // await userHelper.authorizeUser(userIdToken, userId)
     return await userModel.updateUserById(req.body, userId)
   } catch (error) {
     throw error
   }
 }
-const getUserById = async (req) => {
+const getUserInfo = async (req) => {
   try {
-    const { userId } = req.params;
     const userIdToken = req.user.userId
-    const user = await userModel.getUserById(userId);
-    await userHelper.authorizeUser(userIdToken, userId)
+    const user = await userModel.getUserInfo(userIdToken);
 
     const userData = { ...user };
     // Remove sensitive fields
@@ -96,7 +93,7 @@ const getAllUser = async () => {
 export const userService = {
   createNew,
   signIn,
-  getUserById,
+  getUserInfo,
   getAllUser,
   updateUserById
 }
