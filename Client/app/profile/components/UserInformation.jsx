@@ -1,30 +1,76 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useFetch, useMutationApi } from "@/hooks/use-api";
+import { useToast } from "@/hooks/use-toast";
 
 export default function UserInformation() {
   const [isEditing, setIsEditing] = useState(false);
+  const { mutateAsync } = useMutationApi("PUT");
+  const { toast } = useToast();
   const [user, setUser] = useState({
-    name: "John Doe",
+    username: "John Doe",
     email: "john.doe@example.com",
-    phone: "+1 (555) 123-4567",
+    phone_number: "+1 (555) 123-4567",
     address: "123 Main St, Anytown, AN 12345",
   });
 
+  const {
+    data: userInfo,
+    isLoading,
+    error,
+  } = useFetch(`/user/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  useEffect(() => {
+    if (userInfo?.data) {
+      setUser((prevUser) => ({
+        username: userInfo.data.username ?? prevUser.username,
+        email: userInfo.data.email ?? prevUser.email,
+        phone_number: userInfo.data.phone_number ?? prevUser.phone_number,
+        address: userInfo.data.address ?? prevUser.address,
+      }));
+    }
+  }, [userInfo?.data]);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUser((prevUser) => ({ ...prevUser, [name]: value }));
   };
-
-  const handleSubmit = (e) => {
+  const handleEdit = (e) => {
+    e.preventDefault();
+    setIsEditing(true);
+  };
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Here you would typically send the updated user data to your backend
-    console.log("Updated user data:", user);
-    setIsEditing(false);
+    try {
+      const response = await mutateAsync({
+        endpoint: "/user/me",
+        body: user,
+      });
+      if (response) {
+        setIsEditing(false);
+      }
+      toast({
+        title: "Success",
+        description: "Edit successful!",
+        variant: "default",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Something went wrong.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -45,12 +91,12 @@ export default function UserInformation() {
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
           <div>
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="username">Name</Label>
             <Input
               type="text"
-              id="name"
-              name="name"
-              value={user.name}
+              id="username"
+              name="username"
+              value={user.username || ""}
               onChange={handleInputChange}
               disabled={!isEditing}
             />
@@ -61,18 +107,18 @@ export default function UserInformation() {
               type="email"
               id="email"
               name="email"
-              value={user.email}
+              value={user.email || ""}
               onChange={handleInputChange}
               disabled={!isEditing}
             />
           </div>
           <div>
-            <Label htmlFor="phone">Phone</Label>
+            <Label htmlFor="phone_number">Phone</Label>
             <Input
               type="tel"
-              id="phone"
-              name="phone"
-              value={user.phone}
+              id="phone_number"
+              name="phone_number"
+              value={user.phone_number || ""}
               onChange={handleInputChange}
               disabled={!isEditing}
             />
@@ -83,7 +129,7 @@ export default function UserInformation() {
               type="text"
               id="address"
               name="address"
-              value={user.address}
+              value={user.address || ""}
               onChange={handleInputChange}
               disabled={!isEditing}
             />
@@ -104,7 +150,7 @@ export default function UserInformation() {
               </Button>
             </>
           ) : (
-            <Button type="button" onClick={() => setIsEditing(true)}>
+            <Button type="button" onClick={handleEdit}>
               Edit Profile
             </Button>
           )}

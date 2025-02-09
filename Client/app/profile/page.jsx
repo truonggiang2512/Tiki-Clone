@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import UserInformation from "../components/UserInformation";
-import OrderHistory from "../components/OrderHistory";
-import Wishlist from "../components/Wishlist";
-import AccountSettings from "../components/AccountSettings";
+import UserInformation from "./components/UserInformation";
+import OrderHistory from "./components/OrderHistory";
+import Wishlist from "./components/Wishlist";
+import AccountSettings from "./components/AccountSettings";
 
 export default function UserProfile() {
   const [activeTab, setActiveTab] = useState("info");
