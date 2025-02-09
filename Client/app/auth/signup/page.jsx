@@ -5,36 +5,59 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useMutationApi } from "@/hooks/use-api";
+import { useToast } from "@/hooks/use-toast";
+import CitySelect from "@/app/components/CitiesSelect";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
-  const [name, setName] = useState("");
+  const [username, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  const handleSubmit = (e) => {
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [address, setAddress] = useState("");
+  const { mutateAsync, isPending, error } = useMutationApi("POST");
+  const { toast } = useToast();
+  const router = useRouter();
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would typically handle the sign-up logic
-    console.log("Sign up submitted", {
-      name,
-      email,
-      password,
-      confirmPassword,
-    });
+    try {
+      const response = await mutateAsync({
+        endpoint: "/user/signup",
+        body: { username, email, password, phone_number: phoneNumber, address },
+      });
+      console.log(response);
+      toast({
+        title: "Success",
+        description: "Sign up successful!",
+        variant: "default",
+      });
+      if (response) {
+        router.push("/auth/login");
+      }
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Error",
+        description: error.message || "Something went wrong.",
+        variant: "destructive",
+      });
+      // Here you would typically handle the sign-up logic
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-6 ">
       <div className="space-y-4">
         <div>
-          <Label htmlFor="name">Full Name</Label>
+          <Label htmlFor="username">Full Name</Label>
           <Input
-            id="name"
-            name="name"
+            id="username"
+            name="username"
             type="text"
-            autoComplete="name"
+            autoComplete="username"
             required
-            value={name}
+            value={username}
             onChange={(e) => setName(e.target.value)}
             className="mt-1"
           />
@@ -66,17 +89,20 @@ export default function SignUpPage() {
           />
         </div>
         <div>
-          <Label htmlFor="confirm-password">Confirm Password</Label>
+          <Label htmlFor="phone_number">Phone</Label>
           <Input
-            id="confirm-password"
-            name="confirm-password"
-            type="password"
-            autoComplete="new-password"
+            id="phone_number"
+            name="phone_number"
+            type="number"
+            autoComplete="phone_number"
             required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
             className="mt-1"
           />
+        </div>
+        <div>
+          <CitySelect setAddress={setAddress} />
         </div>
       </div>
 
