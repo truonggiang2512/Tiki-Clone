@@ -34,8 +34,8 @@ const updateUserById = async (req, res, next) => {
 }
 const getDetailUser = async (req, res, next) => {
   try {
-    const user = await userService.getUserById(req)
-    res.status(StatusCodes.OK).json({ user })
+    const data = await userService.getUserInfo(req)
+    res.status(StatusCodes.OK).json({ data })
   } catch (error) {
     next(error)
   }

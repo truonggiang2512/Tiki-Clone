@@ -61,7 +61,7 @@ const updateUserById = async (data, userId) => {
   }
 }
 
-const getUserById = async (userId) => {
+const getUserInfo = async (userId) => {
   try {
     return await GET_DB().collection(USER_COLLECTION_NAME).findOne({ _id: ObjectId.createFromHexString(userId) })
   } catch (error) {
@@ -88,7 +88,7 @@ export const userModel = {
   createNew,
   getUserByEmail,
   updateUserById,
-  getUserById,
+  getUserInfo,
   getAllUser,
   softDeleteUser
 }

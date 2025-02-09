@@ -7,6 +7,8 @@ Router.route('/signup')
   .post(userValidation.createNew, userController.createNew),
   Router.route('/login')
     .post(userValidation.signIn, userController.signIn)
-Router.route('/:userId').get(authenticateJWT, userController.getDetailUser).put(authenticateJWT, userValidation.updateOne, userController.updateUserById).delete(authenticateJWT, userController.softDeleteUser)
+Router.route('/me').get(authenticateJWT, userController.getDetailUser)
+  .put(authenticateJWT, userValidation.updateOne, userController.updateUserById)
+  .delete(authenticateJWT, userController.softDeleteUser)
 Router.route('').get(authenticateJWT, authorizeAdmin, userController.getAllUser)
 export const userRoutes = Router
